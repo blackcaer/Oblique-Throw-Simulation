@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+/.vs/PIproject/FileContentIndex
+/.vs/PIproject/v17
+*.vcxproj
+*.filters
+*.user
