@@ -35,3 +35,6 @@
 *.vcxproj
 *.filters
 *.user
+/PIproject/x64/Debug/PIproject.tlog
+/PIproject/x64/Debug
+/x64/Debug
