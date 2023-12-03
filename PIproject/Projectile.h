@@ -12,7 +12,7 @@ public:
 
 	Projectile(sf::CircleShape* shape);
 
-	Projectile(float x = 0.f,float y = 0.f,float r = 10.f);
+	Projectile(float r = 10.f,float x = 0.f,float y = 0.f);
 
 	~Projectile();
 

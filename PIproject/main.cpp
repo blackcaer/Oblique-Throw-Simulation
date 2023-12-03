@@ -1,8 +1,12 @@
 // blackcaer
+#define _USE_MATH_DEFINES
+
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <cmath>
 
 #include "Projectile.h"
+#include "Dir.h"
 
 int main()
 {
@@ -15,19 +19,30 @@ int main()
 	
 	
 	// Shapes
-	auto rect = sf::RectangleShape(sf::Vector2f(40, 80));
+	auto rect = sf::RectangleShape(sf::Vector2f(20000, 20));
 	rect.setFillColor(sf::Color::Green);
-	rect.setPosition(300,300);
+	rect.setPosition(-2000,0);
 
 	auto rect00 = sf::RectangleShape(sf::Vector2f(40, 80));
 	rect00.setFillColor(sf::Color::Blue);
 	rect00.setPosition(0, 0);
 
-	Projectile ball = Projectile();
+	
 
-	float h, v, vx, vy, a;
+	float unit_to_px = 100;
 
-	float speed = 100;
+	float
+		radius = 10.f,
+		h=Dir::up*(radius+1.f),
+		angle = M_PI / 4.f,
+		v = 8.f,
+		vx = v * cos(angle) * Dir::right,
+		vy = v * sin(angle) * Dir::up,
+		g = 9.81f,
+		ax = 0.f,
+		ay = g * Dir::down;
+
+	Projectile ball = Projectile(radius,0.f,h);
 
 	sf::Clock deltaClock;
 	sf::Time deltaTime;
@@ -42,6 +57,7 @@ int main()
 	while (running)
 	{
 		deltaTime = deltaClock.restart();
+		float dt = deltaTime.asSeconds();
 		
 		while (window.pollEvent(event))
 		{
@@ -68,31 +84,62 @@ int main()
 					view.zoom(0.5f);
 				if (event.text.unicode == 'c')
 					view.setCenter(ball.getShape()->getPosition());
+				if (event.text.unicode == 'r')
+					ball.getShape()->setPosition(0,0);
+				if (event.text.unicode == 'g')
+				{
+					vx = 0;
+					vy = 0;
+					ax = 0;
+					ay = 0;
+					simulate_movement = false;
+				}
 			}
 		}
 
 		window.clear(sf::Color(100, 100, 100, 255));
 		window.setView(view);
 
-		sum += deltaTime.asSeconds();
+		sum += dt;
 		// FPS counter
 		if (sum > 1.f)
 		{
 			//printf("FPS: %f\n", counter * 1.f / sum);
 			counter = 0;
 			sum = 0;
-			printf("x=%d, y=%d\n\n", int(ball.getShape()->getPosition().x), (int)(ball.getShape()->getPosition().y));
+			printf("==========\nx=%d, y=%d\n\n", int(ball.getShape()->getPosition().x), (int)(ball.getShape()->getPosition().y));
+			printf("vx=%d, vy=%d\n",(int)vx, (int)vy);
 		}
 
 		if (simulate_movement)
 		{
-			float offset = deltaTime.asSeconds() * speed;
-			ball.move(offset, offset);
+			vx += ax * dt;
+			vy += ay * dt;
+
+			float xoffset = dt * vx * unit_to_px;
+			float yoffset = dt * vy * unit_to_px;
+
+			// Check for colisions
+			auto position = ball.getShape()->getPosition();
+			auto border_y = rect.getPosition().y;
+
+			if (position.y + radius + yoffset >= border_y)
+			{
+				// End movement, colision with the ground
+				float to_col_y = fabs(border_y - position.y);
+				float aoa = atan(vy / vx); // angle of attack
+				float to_col_x = to_col_y / tan(aoa);
+				ball.move(to_col_x - radius, to_col_y - radius);
+				simulate_movement = false;
+			}
+			else {
+				ball.move(xoffset, yoffset);
+			}	
 		}
 
 		window.draw(rect);
 		window.draw(rect00);
-		window.draw(playerText);
+		//window.draw(playerText);
 		window.draw(*ball.getShape());
 		window.display();
 

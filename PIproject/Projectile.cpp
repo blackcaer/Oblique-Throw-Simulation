@@ -12,16 +12,16 @@ Projectile::Projectile(sf::CircleShape* shape)
 
 }
 
-Projectile::Projectile(float x, float y, float r)
+Projectile::Projectile(float r,float x, float y)
 {
 	sf::CircleShape* new_shape = new sf::CircleShape();
 	new_shape->setFillColor(DEF_COLOR);
 	new_shape->setRadius(r);
 	new_shape->setPosition(x, y);
+	new_shape->setOrigin(r,r);
 
 	shape = new_shape;
 	this->shape = shape;
-
 }
 
 Projectile::~Projectile()
