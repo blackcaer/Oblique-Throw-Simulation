@@ -29,6 +29,11 @@ Projectile::~Projectile()
 	delete shape;
 }
 
+Projectile& Projectile::operator=(const Projectile& t)
+{
+	return *this;
+}
+
 sf::Shape* Projectile::getShape()
 {
 	return shape;

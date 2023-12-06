@@ -16,6 +16,8 @@ public:
 
 	~Projectile();
 
+	Projectile& operator=(const Projectile& t);
+
 	sf::Shape* getShape();
 
 	void move(float x, float y);
