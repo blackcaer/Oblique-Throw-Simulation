@@ -1,5 +1,6 @@
 // blackcaer
 #define _USE_MATH_DEFINES
+#define TOLERANCE_F 1e-6
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -7,6 +8,22 @@
 
 #include "Projectile.h"
 #include "Dir.h"
+
+
+
+void reset_values(float* radius, float* h, float* angle, float* v, float* vx, float* vy, float* g, float* ax, float* ay)
+{
+	*radius = 10.f;
+	*h = Dir::up * ((*radius) + 0.f);
+	*angle = M_PI / 4.f;
+	*v = 8.f;
+	*vx = (*v) * cos(*angle) * Dir::right;
+	*vy = (*v) * sin(*angle) * Dir::up;
+	*g = 9.81f;
+	*ax = 0.f;
+	*ay = (*g) * Dir::down;
+
+}
 
 int main()
 {
@@ -19,28 +36,18 @@ int main()
 	
 	
 	// Shapes
-	auto rect = sf::RectangleShape(sf::Vector2f(20000, 20));
-	rect.setFillColor(sf::Color::Green);
-	rect.setPosition(-2000,0);
+	auto ground = sf::RectangleShape(sf::Vector2f(20000, 20));
+	ground.setFillColor(sf::Color::Green);
+	ground.setPosition(-2000,0);
 
-	auto rect00 = sf::RectangleShape(sf::Vector2f(40, 80));
+	auto rect00 = sf::RectangleShape(sf::Vector2f(5, 5));
 	rect00.setFillColor(sf::Color::Blue);
 	rect00.setPosition(0, 0);
 
-	
+	float unit_to_px = 100.f;
 
-	float unit_to_px = 100;
-
-	float
-		radius = 10.f,
-		h=Dir::up*(radius+1.f),
-		angle = M_PI / 4.f,
-		v = 8.f,
-		vx = v * cos(angle) * Dir::right,
-		vy = v * sin(angle) * Dir::up,
-		g = 9.81f,
-		ax = 0.f,
-		ay = g * Dir::down;
+	float radius=0.f, h=0, angle=0, v=0, vx=0, vy=0, g=0, ax=0, ay=0;
+	reset_values(&radius, &h, &angle, &v, &vx, &vy, &g, &ax, &ay);
 
 	Projectile ball = Projectile(radius,0.f,h);
 
@@ -85,13 +92,14 @@ int main()
 				if (event.text.unicode == 'c')
 					view.setCenter(ball.getShape()->getPosition());
 				if (event.text.unicode == 'r')
-					ball.getShape()->setPosition(0,0);
+				{
+					ball.getShape()->setPosition(0.f, radius * Dir::up);
+					reset_values(&radius, &h, &angle, &v, &vx, &vy, &g, &ax, &ay);
+				}
+
 				if (event.text.unicode == 'g')
 				{
-					vx = 0;
-					vy = 0;
-					ax = 0;
-					ay = 0;
+					
 					simulate_movement = false;
 				}
 			}
@@ -110,34 +118,48 @@ int main()
 			printf("==========\nx=%d, y=%d\n\n", int(ball.getShape()->getPosition().x), (int)(ball.getShape()->getPosition().y));
 			printf("vx=%d, vy=%d\n",(int)vx, (int)vy);
 		}
+		//view.setCenter(ball.getShape()->getPosition());
 
 		if (simulate_movement)
 		{
+			
 			vx += ax * dt;
 			vy += ay * dt;
+
+			// sprawdzic z 0.5 offset, center,0.5 offset
+
+			view.setCenter(ball.getShape()->getPosition());
 
 			float xoffset = dt * vx * unit_to_px;
 			float yoffset = dt * vy * unit_to_px;
 
 			// Check for colisions
 			auto position = ball.getShape()->getPosition();
-			auto border_y = rect.getPosition().y;
+			auto border_y = ground.getPosition().y;
 
 			if (position.y + radius + yoffset >= border_y)
 			{
 				// End movement, colision with the ground
-				float to_col_y = fabs(border_y - position.y);
-				float aoa = atan(vy / vx); // angle of attack
-				float to_col_x = to_col_y / tan(aoa);
-				ball.move(to_col_x - radius, to_col_y - radius);
+
+				float to_ground_y = fabs(border_y - position.y);
+
+				if (fabs(vx) <= TOLERANCE_F)
+					ball.move(0.f, to_ground_y - radius);	
+				else
+				{
+					float aoa = atan(vy / vx); // angle of attack
+					float to_ground_x = to_ground_y / tan(aoa);
+					ball.move(to_ground_x - radius, to_ground_y - radius);
+				}
 				simulate_movement = false;
+				
 			}
 			else {
 				ball.move(xoffset, yoffset);
 			}	
 		}
-
-		window.draw(rect);
+		//view.setCenter(ball.getShape()->getPosition());
+		window.draw(ground);
 		window.draw(rect00);
 		//window.draw(playerText);
 		window.draw(*ball.getShape());
