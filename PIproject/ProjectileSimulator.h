@@ -9,6 +9,7 @@
 #include <cmath>
 #include "Projectile.h"
 #include "Dir.h"
+#include "Widget.h"
 
 class ProjectileSimulator
 {
@@ -21,16 +22,18 @@ public:
 
 
 private: 
-	sf::RenderWindow window;
-	sf::View view;
+	sf::Font font_main;
 
+	sf::RenderWindow window;
+	sf::View view_game;
+	sf::View view_controls;
 	sf::RectangleShape ground;
 	sf::RectangleShape rect00;
-
 	Projectile ball;
+	std::vector <Widget*> widgets;
+
 
 	float VIEW_CHANGE = 10.f;
-
 	float unit_to_px = 100.f;
 	bool simulate_movement = false;
 	sf::Time deltaTime;
@@ -42,6 +45,8 @@ private:
 	float time_for_tracer_s = 0.0f;
 	float tracer_interval = 0.1f;
 	sf::Color tracer_color = sf::Color::Blue;
+
+	int focus_number = -1; 
 
 	float radius;
 	float h;
@@ -55,6 +60,8 @@ private:
 
 	int counter = 0;
 	float sum = 0.f;
+
+	void prep_text(sf::Text* text);
 
 	void print_info_to_console();
 
@@ -71,6 +78,11 @@ private:
 	void move();
 
 	void trace();
+
+	void draw_widget(Widget*);
+
+	void create_widgets();
+
 
 	
 };

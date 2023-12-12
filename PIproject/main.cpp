@@ -9,6 +9,7 @@
 #include "Projectile.h"
 #include "Dir.h"
 #include "ProjectileSimulator.h"
+#include "Widget.h"
 
 
 
