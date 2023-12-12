@@ -2,6 +2,8 @@
 #define _USE_MATH_DEFINES
 #define TOLERANCE_F 1e-6
 
+
+#include <vector>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <cmath>
@@ -27,11 +29,19 @@ private:
 
 	Projectile ball;
 
+	
+
 	float unit_to_px = 100.f;
 	bool simulate_movement = false;
 	sf::Time deltaTime;
 	sf::Clock deltaClock;
 
+	//tracer
+	const float TRACER_RADIUS = 4.f;
+	std::vector <sf::CircleShape*> tracers;
+	float time_for_tracer_s = 0.0f;
+	float tracer_interval = 0.1f;
+	sf::Color tracer_color = sf::Color::Blue;
 
 	float radius;
 	float h;
@@ -50,7 +60,7 @@ private:
 
 	void handle_event(sf::Event);
 
-	void reset_values();
+	void reset();
 
 	void center_view();
 
@@ -59,6 +69,8 @@ private:
 	bool check_handle_collision(float*, float*);
 
 	void move();
+
+	void trace();
 
 	
 };

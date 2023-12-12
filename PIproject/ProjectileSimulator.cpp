@@ -8,6 +8,7 @@ ProjectileSimulator::ProjectileSimulator() :
 	ground(sf::Vector2f(20000, 20)),
 	rect00(sf::Vector2f(5, 5))
 {
+	tracers = std::vector <sf::CircleShape*>();
 	window.setVerticalSyncEnabled(true);
 	window.setActive(true);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
@@ -21,12 +22,12 @@ ProjectileSimulator::ProjectileSimulator() :
 	rect00.setFillColor(sf::Color::Blue);
 	rect00.setPosition(0, 0);
 
-	reset_values();
+	reset();
 
 	ball = Projectile(radius, 0.f, h);
 }
 
-void ProjectileSimulator::reset_values()
+void ProjectileSimulator::reset()
 {
 	radius = 10.f;
 	h = Dir::up * (radius + 0.f);
@@ -39,9 +40,15 @@ void ProjectileSimulator::reset_values()
 	ax = 0.f;
 	ay = g * Dir::down;
 
-
 	ball.getShape()->setPosition(0.f,h);
 	center_view();
+
+	// delete tracers
+	for (auto i = 0; i < tracers.size(); i++)
+	{
+		delete tracers[i];
+	}
+	tracers.clear();
 }
 
 void ProjectileSimulator::print_info_to_console()
@@ -88,7 +95,7 @@ void ProjectileSimulator::handle_event(sf::Event event)
 		if (event.text.unicode == 'r')
 		{
 			ball.getShape()->setPosition(0.f, radius * Dir::up);
-			reset_values();
+			reset();
 		}
 
 		if (event.text.unicode == 'g')
@@ -175,6 +182,14 @@ void ProjectileSimulator::move()
 	center_view();
 }
 
+void ProjectileSimulator::trace()
+{
+	sf::CircleShape * tracer = new sf::CircleShape(TRACER_RADIUS);
+	tracer->setFillColor(tracer_color);
+	tracer->setPosition(this->ball.getShape()->getPosition());
+	tracers.push_back(tracer);
+}
+
 void ProjectileSimulator::game_loop()
 {
 	sf::Event event;
@@ -194,7 +209,21 @@ void ProjectileSimulator::game_loop()
 		print_info_to_console();
 
 		if (simulate_movement)
+		{
 			move();
+			time_for_tracer_s += deltaTime.asSeconds();
+			if (time_for_tracer_s >= tracer_interval)
+			{
+				time_for_tracer_s = 0.f;
+				trace();
+			}
+		}
+
+
+		for (auto i = 0; i < tracers.size(); i++)
+		{
+			window.draw(*tracers[i]);
+		}
 
 		window.draw(ground);
 		window.draw(rect00);
