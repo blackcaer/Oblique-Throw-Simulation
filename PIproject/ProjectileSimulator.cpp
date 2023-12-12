@@ -67,6 +67,7 @@ void ProjectileSimulator::print_info_to_console()
 
 void ProjectileSimulator::handle_event(sf::Event event)
 {
+	
 	if (event.type == sf::Event::Closed)
 	{
 		// end the program
@@ -76,7 +77,31 @@ void ProjectileSimulator::handle_event(sf::Event event)
 	{
 
 	}
-	else if (event.type == sf::Event::TextEntered)
+	if (event.type == sf::Event::KeyPressed)
+	{
+		auto center = view.getCenter();
+		if (event.key.code == sf::Keyboard::Up)
+		{
+
+			view.setCenter(center.x,center.y+VIEW_CHANGE*Dir::up);
+		}
+		if (event.key.code == sf::Keyboard::Down)
+		{
+			view.setCenter(center.x, center.y + VIEW_CHANGE * Dir::down);
+
+		}
+		if (event.key.code == sf::Keyboard::Right)
+		{
+			view.setCenter(center.x + VIEW_CHANGE * Dir::right, center.y);
+
+		}
+		if (event.key.code == sf::Keyboard::Left)
+		{
+			view.setCenter(center.x + VIEW_CHANGE * Dir::left, center.y);
+		}
+	}
+
+	if (event.type == sf::Event::TextEntered)
 	{
 		sf::String playerInput;
 		sf::Text playerText;
@@ -218,7 +243,6 @@ void ProjectileSimulator::game_loop()
 				trace();
 			}
 		}
-
 
 		for (auto i = 0; i < tracers.size(); i++)
 		{

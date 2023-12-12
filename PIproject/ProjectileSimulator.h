@@ -29,7 +29,7 @@ private:
 
 	Projectile ball;
 
-	
+	float VIEW_CHANGE = 10.f;
 
 	float unit_to_px = 100.f;
 	bool simulate_movement = false;
