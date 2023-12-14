@@ -10,9 +10,7 @@ Widget::Widget(
 	sf::Color color,
 	std::string font_file
 ) :
-	to_draw(),
-	static_text(static_text),
-	user_text(user_text)
+	to_draw()
 {
 	if (!font_main.loadFromFile(font_file))
 	{
@@ -27,6 +25,9 @@ Widget::Widget(
 	rect_back->setFillColor(color);
 	text = new sf::Text();
 	
+	set_static_text(static_text);
+	set_user_text(user_text);
+
 	prep_text(text);
 	setPosition(x, y);
 
@@ -80,6 +81,14 @@ bool Widget::get_focus()
 	return has_focus;
 }
 
+void Widget::delete_last_char()
+{
+	if (user_text.length()>0)
+	{
+		this->set_user_text(user_text.substr(0, user_text.length() - 1));
+	}
+}
+
 std::string Widget::get_user_text()
 {
 	return user_text;
@@ -89,7 +98,7 @@ void Widget::prep_text(sf::Text* text)
 {
 	text->setFont(font_main);
 	text->setCharacterSize(26); // in pixels, not points
-	text->setFillColor(sf::Color::Blue);
+	text->setFillColor(COLOR_NORMAL);
 	text->setStyle(sf::Text::Bold);
 	centerText();
 }

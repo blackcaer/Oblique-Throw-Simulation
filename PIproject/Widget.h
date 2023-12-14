@@ -31,12 +31,12 @@ public:
 		std::string static_text="",
 		std::string user_text="",
 		sf::Color color = sf::Color(186, 186, 186),
-		std::string font_file = "arial.ttf");
+		std::string font_file = "arial.ttf"
+	);
 
 	void prep_text(sf::Text* text);
 
 	void setPosition(float, float);
-
 
 	void set_user_text(std::string user_text);
 
@@ -45,6 +45,8 @@ public:
 	void centerText();
 
 	void toggle_focus();
+
+	void delete_last_char();
 
 	bool get_focus();
 

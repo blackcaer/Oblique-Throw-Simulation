@@ -1,9 +1,9 @@
-#include "ProjectileSimulator.h"
+﻿#include "ProjectileSimulator.h"
 
 
 // TODO: Przeniesc ground i rect00 do tablicy do pozniejszego draw
 ProjectileSimulator::ProjectileSimulator() :
-	window(sf::VideoMode(1280, 800), "FluidSimulator", sf::Style::Default, sf::ContextSettings(32)),
+	window(sf::VideoMode(1536, 960), "FluidSimulator", sf::Style::Default, sf::ContextSettings(32)),
 	view_game(sf::FloatRect(0, 0, 1080, 720)),//sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f), sf::Vector2f(1280,720)), 
 	view_controls(sf::Vector2f(0,0), sf::Vector2f(1280, 80)),
 	ground(sf::Vector2f(200000, 20)),
@@ -99,9 +99,6 @@ void ProjectileSimulator::print_info_to_console()
 
 void ProjectileSimulator::handle_event(sf::Event event)
 {
-	sf::String playerInput="";
-	//sf::Text playerText=sf::Text();
-
 	auto center = view_game.getCenter();
 
 	switch(event.type)
@@ -116,7 +113,6 @@ void ProjectileSimulator::handle_event(sf::Event event)
 		break;
 	case sf::Event::KeyPressed:
 		
-
 		if (event.key.code == sf::Keyboard::Up)
 			view_game.setCenter(center.x, center.y + VIEW_CHANGE * Dir::up);
 		if (event.key.code == sf::Keyboard::Down)
@@ -143,23 +139,32 @@ void ProjectileSimulator::handle_event(sf::Event event)
 			}
 		}
 
-		// !! Intentionally no break
+		if ((event.key.code == sf::Keyboard::BackSpace or 
+			event.key.code == sf::Keyboard::Delete) and 
+			focus_number != -1
+			)
+		{
+			widgets[focus_number]->delete_last_char();
+		}
+
+		break;
 	case sf::Event::TextEntered:
-		//playerInput = event.text.unicode;
-		//playerText.setString(playerInput);
 
 		printf("%c", event.text.unicode);
 		event.text;
-
-		if (focus_number != -1 and ((event.text.unicode <= 57 and 
-			event.text.unicode >= 48) or 
-			event.text.unicode == 46))
+		
+		// If is a number or dot
+		if (focus_number != -1 and ((event.text.unicode >= 48 and
+			event.text.unicode <= 57) or
+			event.text.unicode == '.'))
 		{
-			auto w = widgets[focus_number]; // current widget
-			auto current_text = w->get_user_text();
-			auto x = event.text.unicode;
-			//w->set_user_text(current_text + (char)event.text.unicode);
-			w->set_user_text(current_text + static_cast<char>(event.text.unicode));
+			auto current_text = widgets[focus_number]->get_user_text();
+			auto aa = event.text.unicode;
+			auto a = current_text;
+			auto b = (event.text.unicode);
+			auto c = (char)(event.text.unicode);
+			auto x = a+c;
+			widgets[focus_number]->set_user_text(x);
 		}
 		if (focus_number != -1)
 			break;
@@ -310,13 +315,11 @@ void ProjectileSimulator::game_loop()
 		}
 
 		//============ Drawing 
-		sf::Text t = sf::Text();
-		t.setString("HEEEEEEEEEEEEE");
+		/*sf::Text t = sf::Text();
+		t.setString("Maybe instrukcja here?\n");
 		prep_text(&t);
-		window.draw(t);
+		window.draw(t);*/
 
-
-		
 		// Widgets
 		window.setView(view_controls);
 		window.draw(top_bar);
@@ -354,9 +357,26 @@ void ProjectileSimulator::draw_widget(Widget* widget)
 
 void ProjectileSimulator::create_widgets()
 {
+	auto space = 170;
+	auto startx = -630;
 	widgets.clear();
-	Widget* widget = new Widget(-640, -40, 160, 80,"H= ");
-	widget->set_user_text("H");
-	widgets.push_back(widget);
+	Widget* widget_v0 = new Widget(startx, -40, 160, 80,"V0=");
+	Widget* widget_alpha = new Widget(startx + space * 1, -40, 160, 80,"alfa=");
+	Widget* widget_h = new Widget(startx + space * 2, -40, 160, 80,"h=");
+	Widget* widget_g = new Widget(startx + space * 3, -40, 160, 80,"g=");
+
+
+	//Widget* widget4 = new Widget(startx + space * 4, -40, 160, 80,"?=");
+	//Widget* widget5 = new Widget(startx + space * 5, -40, 160, 80,"?=");
+	//Widget* widget6 = new Widget(startx + space * 6, -40, 160, 80,"?=");
+
+
+	widgets.push_back(widget_v0);
+	widgets.push_back(widget_alpha);
+	widgets.push_back(widget_h);
+	widgets.push_back(widget_g);
+	//widgets.push_back(widget4);
+	//widgets.push_back(widget5);
+	//widgets.push_back(widget6);
 
 }

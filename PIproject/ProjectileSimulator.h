@@ -48,13 +48,15 @@ private:
 
 	int focus_number = -1; 
 
-	float radius;
-	float h;
-	float angle;
-	float v_start;
+	
+	float h; // Can be set by user
+	float angle; // Can be set by user
+	float v_start; // Can be set by user
+	float g; // Can be set by user
+
+	float radius; 
 	float vx;
 	float vy;
-	float g;
 	float ax;
 	float ay;
 
