@@ -33,20 +33,25 @@ private:
 	std::vector <Widget*> widgets;
 
 
-	float VIEW_CHANGE = 10.f;
+	float VIEW_CHANGE = 30.f;
 	float unit_to_px = 100.f;
 	bool simulate_movement = false;
 	sf::Time deltaTime;
 	sf::Clock deltaClock;
 
 	//tracer
-	const float TRACER_RADIUS = 4.f;
+	const float TRACER_RADIUS = 6.f;
 	std::vector <sf::CircleShape*> tracers;
-	float time_for_tracer_s = 0.0f;
-	float tracer_interval = 0.1f;
+	float tracer_interval = 0.03f;
 	sf::Color tracer_color = sf::Color::Blue;
 
 	int focus_number = -1; 
+
+	const float START_radius = 140.f;
+	const float START_h=0.f;
+	const float START_angle= 45.f;
+	const float START_v_start= 8.f;
+	const float START_g= 9.81f;
 
 	
 	float h; // Can be set by user
@@ -60,8 +65,10 @@ private:
 	float ax;
 	float ay;
 
-	int counter = 0;
-	float sum = 0.f;
+	int fps_per_sec = 0;
+	float sec_elapsed = 0.f;
+
+	static float deg_to_rad(float angle_deg);
 
 	void prep_text(sf::Text* text);
 

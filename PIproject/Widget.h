@@ -3,12 +3,17 @@
 #include <vector>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <string>
+#include <iomanip>
+#include <sstream>
 
 #include "Dir.h"
 
 class Widget
 {
 public:
+	int PRECISION = 2;
+
 	sf::Font font_main;
 	std::vector <sf::Drawable*> to_draw;
 	sf::RectangleShape* rect_back;
@@ -18,6 +23,8 @@ public:
 	
 	sf::Color COLOR_NORMAL = sf::Color::Black;
 	sf::Color COLOR_ACTIVE = sf::Color::Yellow;
+
+	float *binded_variable = NULL;
 
 	float width;
 	float height;
@@ -49,6 +56,12 @@ public:
 	void delete_last_char();
 
 	bool get_focus();
+
+	void update_variable();
+
+	void bind_variable(float*);
+
+	void update_widget();
 
 	std::string get_user_text();
 

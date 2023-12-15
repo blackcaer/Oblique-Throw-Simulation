@@ -10,6 +10,12 @@ ProjectileSimulator::ProjectileSimulator() :
 	rect00(sf::Vector2f(5, 5))
 {
 	
+	radius = START_radius;
+	h = START_h;
+	angle = START_angle;
+	v_start = START_v_start;
+	g = START_g;
+
 	if (!font_main.loadFromFile("arial.ttf"))
 	{
 		printf("FONT ERROR");
@@ -26,16 +32,14 @@ ProjectileSimulator::ProjectileSimulator() :
 	//======== Shapes
 	//auto ground = sf::RectangleShape(sf::Vector2f(20000, 20));
 	ground.setFillColor(sf::Color::Green);
-	ground.setPosition(-2000, 0);
+	ground.setPosition(-70000, 0);
 
 	//auto rect00 = sf::RectangleShape(sf::Vector2f(5, 5));
 	rect00.setFillColor(sf::Color::Blue);
 	rect00.setPosition(0, 0);
-
-	reset();
-
-	ball = Projectile(radius, 0.f, h);
 	
+	this->ball = Projectile(radius, 0.f, h + radius);
+	reset();
 
 	view_controls.setViewport(sf::FloatRect(0, 0, 1, 0.1));
 	view_game.setViewport(sf::FloatRect(0, 0.1, 1, 1));
@@ -59,20 +63,19 @@ void ProjectileSimulator::prep_text(sf::Text* text)
 	text->setStyle(sf::Text::Bold | sf::Text::Underlined);
 }
 
+float ProjectileSimulator::deg_to_rad(float angle_deg)
+{
+	return angle_deg / 180.f * M_PI;
+}
+
 void ProjectileSimulator::reset()
 {
-	radius = 10.f;
-	h = Dir::up * (radius + 0.f);
-	angle = M_PI / 4.f;
-	v_start = 8.f;
-	g = 9.81f;
-
-	vx = v_start * cos(angle) * Dir::right;
-	vy = v_start * sin(angle) * Dir::up;
+	vx = v_start * cos(deg_to_rad(angle)) * Dir::right;
+	vy = v_start * sin(deg_to_rad(angle)) * Dir::up;
 	ax = 0.f;
 	ay = g * Dir::down;
 
-	ball.getShape()->setPosition(0.f,h);
+	ball.getShape()->setPosition(0.f, Dir::up * (h + radius));
 	center_view();
 
 	// delete tracers
@@ -85,115 +88,19 @@ void ProjectileSimulator::reset()
 
 void ProjectileSimulator::print_info_to_console()
 {
-	sum += deltaTime.asSeconds();
+	sec_elapsed += deltaTime.asSeconds();
 	// FPS counter
-	if (sum > 1.f)
+	if (sec_elapsed >= 1.f)
 	{
 		//printf("FPS: %f\n", counter * 1.f / sum);
-		counter = 0;
-		sum = 0;
-		printf("==========\nx=%d, y=%d\n\n", int(ball.getShape()->getPosition().x), (int)(ball.getShape()->getPosition().y));
+		fps_per_sec = 0;
+		sec_elapsed = 0;
+		printf("==========\nx=%d, y=%d\n\n", 
+			int(ball.getShape()->getPosition().x), 
+			(int)(ball.getShape()->getPosition().y));
+
 		printf("vx=%d, vy=%d\n", (int)vx, (int)vy);
 	}
-}
-
-void ProjectileSimulator::handle_event(sf::Event event)
-{
-	auto center = view_game.getCenter();
-
-	switch(event.type)
-	{ 
-	case sf::Event::Closed:
-
-		// end the program
-		running = false;
-		break;
-	case sf::Event::Resized:
-
-		break;
-	case sf::Event::KeyPressed:
-		
-		if (event.key.code == sf::Keyboard::Up)
-			view_game.setCenter(center.x, center.y + VIEW_CHANGE * Dir::up);
-		if (event.key.code == sf::Keyboard::Down)
-			view_game.setCenter(center.x, center.y + VIEW_CHANGE * Dir::down);
-		if (event.key.code == sf::Keyboard::Right)
-			view_game.setCenter(center.x + VIEW_CHANGE * Dir::right, center.y);
-		if (event.key.code == sf::Keyboard::Left)
-			view_game.setCenter(center.x + VIEW_CHANGE * Dir::left, center.y);
-		if (event.key.code == sf::Keyboard::Tab)
-		{
-			if (focus_number == -1)
-			{
-				focus_number = 0;
-				widgets[0]->toggle_focus();
-			}
-			else
-			{
-				widgets[focus_number]->toggle_focus();
-				focus_number++;
-				if (focus_number >= widgets.size())
-					focus_number = -1;
-				else
-					widgets[focus_number]->toggle_focus();
-			}
-		}
-
-		if ((event.key.code == sf::Keyboard::BackSpace or 
-			event.key.code == sf::Keyboard::Delete) and 
-			focus_number != -1
-			)
-		{
-			widgets[focus_number]->delete_last_char();
-		}
-
-		break;
-	case sf::Event::TextEntered:
-
-		printf("%c", event.text.unicode);
-		event.text;
-		
-		// If is a number or dot
-		if (focus_number != -1 and ((event.text.unicode >= 48 and
-			event.text.unicode <= 57) or
-			event.text.unicode == '.'))
-		{
-			auto current_text = widgets[focus_number]->get_user_text();
-			auto aa = event.text.unicode;
-			auto a = current_text;
-			auto b = (event.text.unicode);
-			auto c = (char)(event.text.unicode);
-			auto x = a+c;
-			widgets[focus_number]->set_user_text(x);
-		}
-		if (focus_number != -1)
-			break;
-
-		if (event.text.unicode == 's')
-			simulate_movement = true;
-		if (event.text.unicode == 'x')
-			view_game.zoom(2.f);
-		if (event.text.unicode == 'z')
-			view_game.zoom(0.5f);
-		if (event.text.unicode == 'c')
-			view_game.setCenter(ball.getShape()->getPosition());
-		if (event.text.unicode == 'r')
-		{
-			ball.getShape()->setPosition(0.f, radius * Dir::up);
-			reset();
-		}
-
-		if (event.text.unicode == 'g')
-		{
-			simulate_movement = false;
-		}
-
-		break;
-
-	default:
-		break;
-	}
-	
 }
 
 void ProjectileSimulator::center_view()
@@ -250,11 +157,6 @@ void ProjectileSimulator::move()
 {
 	float dt = deltaTime.asSeconds();
 
-	/*vx += ax * dt;
-	vy += ay * dt;
-	float xoffset = dt * vx * unit_to_px;
-	float yoffset = dt * vy * unit_to_px;*/
-
 	float xoffset = (vx * dt + ax * dt * dt / 2.f) * unit_to_px;
 	float yoffset = (vy * dt + ay * dt * dt / 2.f) * unit_to_px;
 
@@ -281,6 +183,143 @@ void ProjectileSimulator::trace()
 	tracers.push_back(tracer);
 }
 
+void ProjectileSimulator::draw_widget(Widget* widget)
+{
+	for (int i = 0; i < widget->to_draw.size(); i++)
+	{
+		window.draw(*(widget->to_draw[i]));
+	}
+}
+
+void ProjectileSimulator::create_widgets()
+{
+	auto space = 170;
+	auto startx = -630;
+	widgets.clear();
+	Widget* widget_v0 = new Widget(startx, -40, 160, 80,"V0=");
+	Widget* widget_alpha = new Widget(startx + space * 1, -40, 160, 80,"alfa=");
+	Widget* widget_h = new Widget(startx + space * 2, -40, 160, 80,"h=");
+	Widget* widget_g = new Widget(startx + space * 3, -40, 160, 80,"g=");
+
+	widget_v0->bind_variable(&v_start);
+	widget_alpha->bind_variable(&angle);
+	widget_h->bind_variable(&h);
+	widget_g->bind_variable(&g);
+
+	widget_v0->update_widget();
+	widget_alpha->update_widget();
+	widget_h->update_widget();
+	widget_g->update_widget();
+
+	//Widget* widget4 = new Widget(startx + space * 4, -40, 160, 80,"?=");
+	//Widget* widget5 = new Widget(startx + space * 5, -40, 160, 80,"?=");
+	//Widget* widget6 = new Widget(startx + space * 6, -40, 160, 80,"?=");
+
+	widgets.push_back(widget_v0);
+	widgets.push_back(widget_alpha);
+	widgets.push_back(widget_h);
+	widgets.push_back(widget_g);
+	//widgets.push_back(widget4);
+	//widgets.push_back(widget5);
+	//widgets.push_back(widget6);
+
+}
+
+void ProjectileSimulator::handle_event(sf::Event event) 
+{
+	auto center = view_game.getCenter();
+
+	switch (event.type)
+	{
+	case sf::Event::Closed:
+
+		// end the program
+		running = false;
+		break;
+	case sf::Event::Resized:
+
+		break;
+	case sf::Event::KeyPressed:
+
+		if (event.key.code == sf::Keyboard::Up)
+			view_game.setCenter(center.x, center.y + VIEW_CHANGE * Dir::up);
+		if (event.key.code == sf::Keyboard::Down)
+			view_game.setCenter(center.x, center.y + VIEW_CHANGE * Dir::down);
+		if (event.key.code == sf::Keyboard::Right)
+			view_game.setCenter(center.x + VIEW_CHANGE * Dir::right, center.y);
+		if (event.key.code == sf::Keyboard::Left)
+			view_game.setCenter(center.x + VIEW_CHANGE * Dir::left, center.y);
+		if (event.key.code == sf::Keyboard::Tab)
+		{
+			if (focus_number == -1)
+			{
+				focus_number = 0;
+				widgets[0]->toggle_focus();
+			}
+			else
+			{
+				widgets[focus_number]->update_variable(); // update previous widget
+				widgets[focus_number]->toggle_focus(); // turn it OFF
+
+				focus_number++;
+
+				if (focus_number >= widgets.size())
+					focus_number = -1;	// This was last widget, set to -1
+				else
+					widgets[focus_number]->toggle_focus(); // turn ON new widget
+			}
+		}
+
+		if ((event.key.code == sf::Keyboard::BackSpace or
+			event.key.code == sf::Keyboard::Delete) and
+			focus_number != -1
+			)
+		{
+			widgets[focus_number]->delete_last_char();
+		}
+		break;
+	case sf::Event::TextEntered:
+		printf("%c", event.text.unicode);
+		event.text;
+
+		// If is a number or dot
+		if (focus_number != -1 and ((event.text.unicode >= 48 and
+			event.text.unicode <= 57) or
+			event.text.unicode == '.'))
+		{
+			auto current_text = widgets[focus_number]->get_user_text();
+			widgets[focus_number]->set_user_text(current_text + (char)(event.text.unicode));
+		}
+		if (focus_number != -1)
+			break;
+
+		if (event.text.unicode == 's')
+			simulate_movement = true;
+		if (event.text.unicode == 'x')
+			view_game.zoom(2.f);
+		if (event.text.unicode == 'z')
+			view_game.zoom(0.5f);
+		if (event.text.unicode == 'c')
+			view_game.setCenter(ball.getShape()->getPosition());
+		if (event.text.unicode == 'r')
+		{
+			ball.getShape()->setPosition(0.f, radius * Dir::up);
+			reset();
+		}
+
+		if (event.text.unicode == 'g')
+		{
+			simulate_movement = false;
+		}
+
+		break;
+
+	default:
+		break;
+	}
+
+}
+
 void ProjectileSimulator::game_loop()
 {
 	auto top_bar = sf::RectangleShape(sf::Vector2f(1280, 200));
@@ -288,10 +327,12 @@ void ProjectileSimulator::game_loop()
 	top_bar.setPosition(-640, -100);
 	create_widgets();
 
+	float time_for_tracer_s = 0.0f;
 	sf::Event event;
 	while (running)
 	{
 		deltaTime = deltaClock.restart();
+		
 
 		while (window.pollEvent(event))
 		{
@@ -300,7 +341,7 @@ void ProjectileSimulator::game_loop()
 
 		window.setView(view_game);
 		window.clear(sf::Color(100, 100, 100, 255));
-		
+
 		print_info_to_console();
 
 		if (simulate_movement)
@@ -328,55 +369,20 @@ void ProjectileSimulator::game_loop()
 			draw_widget(widgets[i]);
 		}
 		window.setView(view_game);
-		
+
 		// Tracers
 		for (auto i = 0; i < tracers.size(); i++)
 		{
 			window.draw(*tracers[i]);
 		}
 
-		
 		window.draw(ground);
 		window.draw(rect00);
 		window.draw(*(ball.getShape()));
 		//window.draw(playerText);
 		window.display();
 
-		counter++;
+		fps_per_sec++;
 	}
-
-}
-
-void ProjectileSimulator::draw_widget(Widget* widget)
-{
-	for (int i = 0; i < widget->to_draw.size(); i++)
-	{
-		window.draw(*(widget->to_draw[i]));
-	}
-}
-
-void ProjectileSimulator::create_widgets()
-{
-	auto space = 170;
-	auto startx = -630;
-	widgets.clear();
-	Widget* widget_v0 = new Widget(startx, -40, 160, 80,"V0=");
-	Widget* widget_alpha = new Widget(startx + space * 1, -40, 160, 80,"alfa=");
-	Widget* widget_h = new Widget(startx + space * 2, -40, 160, 80,"h=");
-	Widget* widget_g = new Widget(startx + space * 3, -40, 160, 80,"g=");
-
-
-	//Widget* widget4 = new Widget(startx + space * 4, -40, 160, 80,"?=");
-	//Widget* widget5 = new Widget(startx + space * 5, -40, 160, 80,"?=");
-	//Widget* widget6 = new Widget(startx + space * 6, -40, 160, 80,"?=");
-
-
-	widgets.push_back(widget_v0);
-	widgets.push_back(widget_alpha);
-	widgets.push_back(widget_h);
-	widgets.push_back(widget_g);
-	//widgets.push_back(widget4);
-	//widgets.push_back(widget5);
-	//widgets.push_back(widget6);
 
 }

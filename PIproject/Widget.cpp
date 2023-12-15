@@ -103,9 +103,34 @@ void Widget::prep_text(sf::Text* text)
 	centerText();
 }
 
-
 void Widget::_set_text()
 {
 	this->text->setString(static_text + user_text);
 	centerText();
+}
+
+void Widget::bind_variable(float* var)
+{
+	binded_variable = var;
+}
+
+void Widget::update_variable()
+{
+	if (binded_variable != NULL and user_text!="")
+	{
+		*binded_variable = std::stof(user_text);
+	}
+}
+
+void Widget::update_widget()
+{
+	if (binded_variable != NULL)
+	{
+		std::stringstream stream;
+		stream << std::fixed << std::setprecision(PRECISION) << *binded_variable;
+
+		user_text = stream.str();
+		this->_set_text();
+
+	}
 }
