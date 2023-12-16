@@ -12,7 +12,8 @@
 class Widget
 {
 public:
-	int PRECISION = 2;
+	int pixel_size = 26;
+	int precision = 2;
 
 	sf::Font font_main;
 	std::vector <sf::Drawable*> to_draw;

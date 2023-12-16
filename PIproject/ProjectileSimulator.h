@@ -47,7 +47,7 @@ private:
 
 	int focus_number = -1;
 
-	const float START_radius = 14x0.f;
+	const float START_radius = 16.f;
 	const float START_h = 0.f;
 	const float START_angle = 45.f;
 	const float START_v_start = 8.f;
@@ -70,7 +70,7 @@ private:
 
 	static float deg_to_rad(float angle_deg);
 
-	void prep_text(sf::Text* text);
+	void prep_text(sf::Text* text, int size, sf::Color color);
 
 	void print_info_to_console();
 

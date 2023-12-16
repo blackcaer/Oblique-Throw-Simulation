@@ -5,7 +5,7 @@
 ProjectileSimulator::ProjectileSimulator() :
 	window(sf::VideoMode(1536, 960), "FluidSimulator", sf::Style::Default, sf::ContextSettings(32)),
 	view_game(sf::FloatRect(0, 0, 1080, 720)),//sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f), sf::Vector2f(1280,720)), 
-	view_controls(sf::Vector2f(0, 0), sf::Vector2f(1280, 80)),
+	view_controls(sf::Vector2f(0, 0), sf::Vector2f(1280, 192)),
 	ground(sf::Vector2f(200000, 20)),
 	rect00(sf::Vector2f(5, 5))
 {
@@ -38,22 +38,22 @@ ProjectileSimulator::ProjectileSimulator() :
 	this->ball = Projectile(radius, 0.f, h + radius);
 	reset();
 
-	view_controls.setViewport(sf::FloatRect(0, 0, 1, 0.1));
-	view_game.setViewport(sf::FloatRect(0, 0.1, 1, 1));
+	view_controls.setViewport(sf::FloatRect(0, 0, 1, 0.2));
+	view_game.setViewport(sf::FloatRect(0, 0.2, 1, 1));
 
 
 }
 
-void ProjectileSimulator::prep_text(sf::Text* text)
+void ProjectileSimulator::prep_text(sf::Text* text,int size,sf::Color color)
 {
 	text->setFont(font_main);
 
-	text->setCharacterSize(32); // in pixels, not points
+	text->setCharacterSize(size); // in pixels, not points
 	//text->setPosition(200, 100);
 
-	text->setFillColor(sf::Color::Blue);
+	text->setFillColor(color);
 
-	text->setStyle(sf::Text::Bold | sf::Text::Underlined);
+	//text->setStyle(sf::Text::Bold | sf::Text::Underlined);
 }
 
 float ProjectileSimulator::deg_to_rad(float angle_deg)
@@ -155,7 +155,7 @@ void ProjectileSimulator::move()
 
 	vx += ax * dt;
 	vy += ay * dt;
-
+	
 	bool will_collide = check_handle_collision(&xoffset, &yoffset);
 	if (will_collide)
 	{
@@ -189,11 +189,12 @@ void ProjectileSimulator::create_widgets()
 {
 	auto space = 170;
 	auto startx = -630;
+	int height = 96;
 	widgets.clear();
-	Widget* widget_v0 = new Widget(startx, -40, 160, 80, "V0=");
-	Widget* widget_alpha = new Widget(startx + space * 1, -40, 160, 80, "alfa=");
-	Widget* widget_h = new Widget(startx + space * 2, -40, 160, 80, "h=");
-	Widget* widget_g = new Widget(startx + space * 3, -40, 160, 80, "g=");
+	Widget* widget_v0 = new Widget(startx				, -height , 160, height, "V0=");
+	Widget* widget_alpha = new Widget(startx + space * 1, -height , 160, height, "alfa=");
+	Widget* widget_h = new Widget(startx + space * 2	, -height , 160, height, "h=");
+	Widget* widget_g = new Widget(startx + space * 3	, -height , 160, height, "g=");
 
 	widget_v0->bind_variable(&v_start);
 	widget_alpha->bind_variable(&angle);
@@ -332,13 +333,18 @@ void ProjectileSimulator::handle_event(sf::Event event)
 
 void ProjectileSimulator::game_loop()
 {
-	auto top_bar = sf::RectangleShape(sf::Vector2f(1280, 200));
-	top_bar.setFillColor(sf::Color(55, 55, 55));
+	auto top_bar = sf::RectangleShape(sf::Vector2f(1280, 300));
+	top_bar.setFillColor(sf::Color(90 , 90, 90));
 	top_bar.setPosition(-640, -100);
 	create_widgets();
 
+	sf::Text text1 = sf::Text();
+	prep_text(&text1, 32, sf::Color::Black);
+	//text1.setPosition();
+
 	float time_for_tracer_s = 0.0f;
 	sf::Event event;
+
 	while (running)
 	{
 		deltaTime = deltaClock.restart();
@@ -349,7 +355,7 @@ void ProjectileSimulator::game_loop()
 		}
 
 		window.setView(view_game);
-		window.clear(sf::Color(100, 100, 100, 255));
+		window.clear(sf::Color(110, 110, 110, 255));
 
 		print_info_to_console();
 
@@ -363,8 +369,9 @@ void ProjectileSimulator::game_loop()
 				trace();
 			}
 		}
-
+		
 		//============ Drawing 
+		
 		// Widgets
 		window.setView(view_controls);
 		window.draw(top_bar);
@@ -372,6 +379,10 @@ void ProjectileSimulator::game_loop()
 		{
 			draw_widget(widgets[i]);
 		}
+		text1.setString(std::to_string(vy));
+		text1.setPosition(-640+20, 20);
+		window.draw(text1);
+
 		window.setView(view_game);
 
 		// Tracers
@@ -380,11 +391,15 @@ void ProjectileSimulator::game_loop()
 			window.draw(*tracers[i]);
 		}
 
+
+
 		window.draw(ground);
 		window.draw(rect00);
 		window.draw(*(ball.getShape()));
 		//window.draw(playerText);
 		window.display();
+
+		
 
 		fps_per_sec++;
 	}

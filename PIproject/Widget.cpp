@@ -97,7 +97,7 @@ std::string Widget::get_user_text()
 void Widget::prep_text(sf::Text* text)
 {
 	text->setFont(font_main);
-	text->setCharacterSize(26); // in pixels, not points
+	text->setCharacterSize(pixel_size); // in pixels, not points
 	text->setFillColor(COLOR_NORMAL);
 	text->setStyle(sf::Text::Bold);
 	centerText();
@@ -127,7 +127,7 @@ void Widget::update_widget()
 	if (binded_variable != NULL)
 	{
 		std::stringstream stream;
-		stream << std::fixed << std::setprecision(PRECISION) << *binded_variable;
+		stream << std::fixed << std::setprecision(precision) << *binded_variable;
 
 		user_text = stream.str();
 		this->_set_text();
