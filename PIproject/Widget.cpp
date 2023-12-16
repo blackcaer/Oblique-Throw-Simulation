@@ -1,10 +1,10 @@
 #include "Widget.h"
 
 Widget::Widget(
-	float x, 
-	float y, 
-	float width, 
-	float height, 
+	float x,
+	float y,
+	float width,
+	float height,
 	std::string static_text,
 	std::string user_text,
 	sf::Color color,
@@ -24,7 +24,7 @@ Widget::Widget(
 	rect_back = new sf::RectangleShape(sf::Vector2f(this->width, this->height));
 	rect_back->setFillColor(color);
 	text = new sf::Text();
-	
+
 	set_static_text(static_text);
 	set_user_text(user_text);
 
@@ -37,20 +37,20 @@ Widget::Widget(
 
 void Widget::setPosition(float x, float y)
 {
-	rect_back->setPosition(x, y); 
-	text->setPosition(x,y);
+	rect_back->setPosition(x, y);
+	text->setPosition(x, y);
 	centerText();
 }
 
 void Widget::set_user_text(std::string user_text)
 {
-	this->user_text=user_text;
+	this->user_text = user_text;
 	_set_text();
 }
 
 void Widget::set_static_text(std::string static_text)
 {
-	this->static_text=static_text;
+	this->static_text = static_text;
 	_set_text();
 }
 
@@ -83,7 +83,7 @@ bool Widget::get_focus()
 
 void Widget::delete_last_char()
 {
-	if (user_text.length()>0)
+	if (user_text.length() > 0)
 	{
 		this->set_user_text(user_text.substr(0, user_text.length() - 1));
 	}
@@ -116,7 +116,7 @@ void Widget::bind_variable(float* var)
 
 void Widget::update_variable()
 {
-	if (binded_variable != NULL and user_text!="")
+	if (binded_variable != NULL and user_text != "")
 	{
 		*binded_variable = std::stof(user_text);
 	}

@@ -32,13 +32,13 @@ Projectile& Projectile::operator=(const Projectile& other)
 	return *this;
 }
 
-Projectile::Projectile(float r,float x, float y)
+Projectile::Projectile(float r, float x, float y)
 {
 	sf::CircleShape* new_shape = new sf::CircleShape();
 	new_shape->setFillColor(DEF_COLOR);
 	new_shape->setRadius(r);
 	new_shape->setPosition(x, y);
-	new_shape->setOrigin(r,r);
+	new_shape->setOrigin(r, r);
 
 	this->shape = new_shape;
 }

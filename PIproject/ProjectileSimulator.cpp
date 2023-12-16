@@ -5,11 +5,10 @@
 ProjectileSimulator::ProjectileSimulator() :
 	window(sf::VideoMode(1536, 960), "FluidSimulator", sf::Style::Default, sf::ContextSettings(32)),
 	view_game(sf::FloatRect(0, 0, 1080, 720)),//sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f), sf::Vector2f(1280,720)), 
-	view_controls(sf::Vector2f(0,0), sf::Vector2f(1280, 80)),
+	view_controls(sf::Vector2f(0, 0), sf::Vector2f(1280, 80)),
 	ground(sf::Vector2f(200000, 20)),
 	rect00(sf::Vector2f(5, 5))
 {
-	
 	radius = START_radius;
 	h = START_h;
 	angle = START_angle;
@@ -26,29 +25,23 @@ ProjectileSimulator::ProjectileSimulator() :
 	widgets = std::vector <Widget*>();
 	window.setVerticalSyncEnabled(true);
 	window.setActive(true);
-	
-	window.clear(sf::Color(255,0,0));
+
+	window.clear(sf::Color(255, 0, 0));
 
 	//======== Shapes
-	//auto ground = sf::RectangleShape(sf::Vector2f(20000, 20));
 	ground.setFillColor(sf::Color::Green);
 	ground.setPosition(-70000, 0);
 
-	//auto rect00 = sf::RectangleShape(sf::Vector2f(5, 5));
 	rect00.setFillColor(sf::Color::Blue);
 	rect00.setPosition(0, 0);
-	
+
 	this->ball = Projectile(radius, 0.f, h + radius);
 	reset();
 
 	view_controls.setViewport(sf::FloatRect(0, 0, 1, 0.1));
 	view_game.setViewport(sf::FloatRect(0, 0.1, 1, 1));
-	 
-	//view_game.setViewport(sf::FloatRect(0.5f, 0, 0.5f, 1.0f)); 
 
-	//window.setView(view_controls);
-	//window.clear(sf::Color(255, 00, 00, 255));
-	
+
 }
 
 void ProjectileSimulator::prep_text(sf::Text* text)
@@ -95,8 +88,8 @@ void ProjectileSimulator::print_info_to_console()
 		//printf("FPS: %f\n", counter * 1.f / sum);
 		fps_per_sec = 0;
 		sec_elapsed = 0;
-		printf("==========\nx=%d, y=%d\n\n", 
-			int(ball.getShape()->getPosition().x), 
+		printf("==========\nx=%d, y=%d\n\n",
+			int(ball.getShape()->getPosition().x),
 			(int)(ball.getShape()->getPosition().y));
 
 		printf("vx=%d, vy=%d\n", (int)vx, (int)vy);
@@ -118,11 +111,11 @@ bool ProjectileSimulator::is_collision(float y)
 	return false;
 }
 
-bool ProjectileSimulator::check_handle_collision(float* xoffset,float* yoffset)
+bool ProjectileSimulator::check_handle_collision(float* xoffset, float* yoffset)
 {
 	// Check for colisions
 	auto position = ball.getShape()->getPosition();
-	
+
 	if (is_collision(position.y + radius + *yoffset))
 	{
 		// End movement, colision with the ground
@@ -177,8 +170,9 @@ void ProjectileSimulator::move()
 
 void ProjectileSimulator::trace()
 {
-	sf::CircleShape * tracer = new sf::CircleShape(TRACER_RADIUS);
+	sf::CircleShape* tracer = new sf::CircleShape(TRACER_RADIUS);
 	tracer->setFillColor(tracer_color);
+	tracer->setOrigin(TRACER_RADIUS, TRACER_RADIUS);
 	tracer->setPosition(this->ball.getShape()->getPosition());
 	tracers.push_back(tracer);
 }
@@ -196,10 +190,10 @@ void ProjectileSimulator::create_widgets()
 	auto space = 170;
 	auto startx = -630;
 	widgets.clear();
-	Widget* widget_v0 = new Widget(startx, -40, 160, 80,"V0=");
-	Widget* widget_alpha = new Widget(startx + space * 1, -40, 160, 80,"alfa=");
-	Widget* widget_h = new Widget(startx + space * 2, -40, 160, 80,"h=");
-	Widget* widget_g = new Widget(startx + space * 3, -40, 160, 80,"g=");
+	Widget* widget_v0 = new Widget(startx, -40, 160, 80, "V0=");
+	Widget* widget_alpha = new Widget(startx + space * 1, -40, 160, 80, "alfa=");
+	Widget* widget_h = new Widget(startx + space * 2, -40, 160, 80, "h=");
+	Widget* widget_g = new Widget(startx + space * 3, -40, 160, 80, "g=");
 
 	widget_v0->bind_variable(&v_start);
 	widget_alpha->bind_variable(&angle);
@@ -225,10 +219,77 @@ void ProjectileSimulator::create_widgets()
 
 }
 
-void ProjectileSimulator::handle_event(sf::Event event) 
+void ProjectileSimulator::handle_moving_view(sf::Event event)
 {
 	auto center = view_game.getCenter();
+	if (event.key.code == sf::Keyboard::Up)
+		view_game.setCenter(center.x, center.y + VIEW_CHANGE * Dir::up);
+	if (event.key.code == sf::Keyboard::Down)
+		view_game.setCenter(center.x, center.y + VIEW_CHANGE * Dir::down);
+	if (event.key.code == sf::Keyboard::Right)
+		view_game.setCenter(center.x + VIEW_CHANGE * Dir::right, center.y);
+	if (event.key.code == sf::Keyboard::Left)
+		view_game.setCenter(center.x + VIEW_CHANGE * Dir::left, center.y);
+}
 
+void ProjectileSimulator::handle_tab()
+{
+	if (focus_number == -1)
+	{
+		focus_number = 0;
+		widgets[0]->toggle_focus();
+	}
+	else
+	{
+		widgets[focus_number]->update_variable(); // update previous widget
+		widgets[focus_number]->toggle_focus(); // turn it OFF
+
+		focus_number++;
+
+		if (focus_number >= widgets.size())
+			focus_number = -1;	// This was last widget, set to -1
+		else
+			widgets[focus_number]->toggle_focus(); // turn ON new widget
+	}
+}
+
+void ProjectileSimulator::handle_letters(sf::Event event)
+{
+	if (event.text.unicode == 's')
+		simulate_movement = true;
+	if (event.text.unicode == 'x')
+		view_game.zoom(2.f);
+	if (event.text.unicode == 'z')
+		view_game.zoom(0.5f);
+	if (event.text.unicode == 'c')
+		view_game.setCenter(ball.getShape()->getPosition());
+	if (event.text.unicode == 'r')
+	{
+		ball.getShape()->setPosition(0.f, radius * Dir::up);
+		reset();
+	}
+
+	if (event.text.unicode == 'g')
+	{
+		simulate_movement = false;
+	}
+}
+
+void ProjectileSimulator::handle_entering_numbers(sf::Event event)
+{
+	if (focus_number != -1 and ((
+		event.text.unicode >= 48 and
+		event.text.unicode <= 57) or
+		event.text.unicode == '.'
+		))
+	{
+		auto current_text = widgets[focus_number]->get_user_text();
+		widgets[focus_number]->set_user_text(current_text + (char)(event.text.unicode));
+	}
+}
+
+void ProjectileSimulator::handle_event(sf::Event event)
+{
 	switch (event.type)
 	{
 	case sf::Event::Closed:
@@ -241,79 +302,28 @@ void ProjectileSimulator::handle_event(sf::Event event)
 		break;
 	case sf::Event::KeyPressed:
 
-		if (event.key.code == sf::Keyboard::Up)
-			view_game.setCenter(center.x, center.y + VIEW_CHANGE * Dir::up);
-		if (event.key.code == sf::Keyboard::Down)
-			view_game.setCenter(center.x, center.y + VIEW_CHANGE * Dir::down);
-		if (event.key.code == sf::Keyboard::Right)
-			view_game.setCenter(center.x + VIEW_CHANGE * Dir::right, center.y);
-		if (event.key.code == sf::Keyboard::Left)
-			view_game.setCenter(center.x + VIEW_CHANGE * Dir::left, center.y);
+		handle_moving_view(event);
+
 		if (event.key.code == sf::Keyboard::Tab)
-		{
-			if (focus_number == -1)
-			{
-				focus_number = 0;
-				widgets[0]->toggle_focus();
-			}
-			else
-			{
-				widgets[focus_number]->update_variable(); // update previous widget
-				widgets[focus_number]->toggle_focus(); // turn it OFF
+			handle_tab();
 
-				focus_number++;
-
-				if (focus_number >= widgets.size())
-					focus_number = -1;	// This was last widget, set to -1
-				else
-					widgets[focus_number]->toggle_focus(); // turn ON new widget
-			}
-		}
-
-		if ((event.key.code == sf::Keyboard::BackSpace or
-			event.key.code == sf::Keyboard::Delete) and
-			focus_number != -1
+		if (
+			focus_number != -1 and
+			(event.key.code == sf::Keyboard::BackSpace or
+				event.key.code == sf::Keyboard::Delete)
 			)
 		{
 			widgets[focus_number]->delete_last_char();
 		}
 		break;
+
 	case sf::Event::TextEntered:
 		printf("%c", event.text.unicode);
-		event.text;
-
-		// If is a number or dot
-		if (focus_number != -1 and ((event.text.unicode >= 48 and
-			event.text.unicode <= 57) or
-			event.text.unicode == '.'))
-		{
-			auto current_text = widgets[focus_number]->get_user_text();
-			widgets[focus_number]->set_user_text(current_text + (char)(event.text.unicode));
-		}
-		if (focus_number != -1)
-			break;
-
-		if (event.text.unicode == 's')
-			simulate_movement = true;
-		if (event.text.unicode == 'x')
-			view_game.zoom(2.f);
-		if (event.text.unicode == 'z')
-			view_game.zoom(0.5f);
-		if (event.text.unicode == 'c')
-			view_game.setCenter(ball.getShape()->getPosition());
-		if (event.text.unicode == 'r')
-		{
-			ball.getShape()->setPosition(0.f, radius * Dir::up);
-			reset();
-		}
-
-		if (event.text.unicode == 'g')
-		{
-			simulate_movement = false;
-		}
+		handle_entering_numbers(event);
+		if (focus_number == -1)
+			handle_letters(event);
 
 		break;
-
 	default:
 		break;
 	}
@@ -332,7 +342,6 @@ void ProjectileSimulator::game_loop()
 	while (running)
 	{
 		deltaTime = deltaClock.restart();
-		
 
 		while (window.pollEvent(event))
 		{
@@ -356,11 +365,6 @@ void ProjectileSimulator::game_loop()
 		}
 
 		//============ Drawing 
-		/*sf::Text t = sf::Text();
-		t.setString("Maybe instrukcja here?\n");
-		prep_text(&t);
-		window.draw(t);*/
-
 		// Widgets
 		window.setView(view_controls);
 		window.draw(top_bar);

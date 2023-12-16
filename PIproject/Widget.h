@@ -20,23 +20,23 @@ public:
 	sf::Text* text;
 	std::string static_text;
 	std::string user_text;
-	
+
 	sf::Color COLOR_NORMAL = sf::Color::Black;
 	sf::Color COLOR_ACTIVE = sf::Color::Yellow;
 
-	float *binded_variable = NULL;
+	float* binded_variable = NULL;
 
 	float width;
 	float height;
 	float x;
 	float y;
-	
+
 	Widget(float x,
 		float y,
 		float width,
-		float height, 
-		std::string static_text="",
-		std::string user_text="",
+		float height,
+		std::string static_text = "",
+		std::string user_text = "",
 		sf::Color color = sf::Color(186, 186, 186),
 		std::string font_file = "arial.ttf"
 	);

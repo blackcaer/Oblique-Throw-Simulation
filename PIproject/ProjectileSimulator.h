@@ -17,11 +17,11 @@ public:
 	bool running = true;
 
 	ProjectileSimulator();
-	
+
 	void game_loop();
 
 
-private: 
+private:
 	sf::Font font_main;
 
 	sf::RenderWindow window;
@@ -45,21 +45,21 @@ private:
 	float tracer_interval = 0.03f;
 	sf::Color tracer_color = sf::Color::Blue;
 
-	int focus_number = -1; 
+	int focus_number = -1;
 
-	const float START_radius = 140.f;
-	const float START_h=0.f;
-	const float START_angle= 45.f;
-	const float START_v_start= 8.f;
-	const float START_g= 9.81f;
+	const float START_radius = 14x0.f;
+	const float START_h = 0.f;
+	const float START_angle = 45.f;
+	const float START_v_start = 8.f;
+	const float START_g = 9.81f;
 
-	
+
 	float h; // Can be set by user
 	float angle; // Can be set by user
 	float v_start; // Can be set by user
 	float g; // Can be set by user
 
-	float radius; 
+	float radius;
 	float vx;
 	float vy;
 	float ax;
@@ -80,6 +80,14 @@ private:
 
 	void center_view();
 
+	void handle_moving_view(sf::Event event);
+
+	void handle_tab();
+
+	void handle_letters(sf::Event event);
+
+	void handle_entering_numbers(sf::Event event);
+
 	bool is_collision(float y);
 
 	bool check_handle_collision(float*, float*);
@@ -93,6 +101,6 @@ private:
 	void create_widgets();
 
 
-	
+
 };
 
