@@ -22,7 +22,7 @@ ProjectileSimulator::ProjectileSimulator() :
 	}
 
 	tracers = std::vector <sf::CircleShape*>();
-	widgets = std::vector <Widget*>();
+	widgets_in = std::vector <Widget*>();
 	window.setVerticalSyncEnabled(true);
 	window.setActive(true);
 
@@ -36,6 +36,7 @@ ProjectileSimulator::ProjectileSimulator() :
 	rect00.setPosition(0, 0);
 
 	this->ball = Projectile(radius, 0.f, h + radius);
+	ball.set_zero_coordinates();
 	reset();
 
 	view_controls.setViewport(sf::FloatRect(0, 0, 1, 0.2));
@@ -69,6 +70,7 @@ void ProjectileSimulator::reset()
 	ay = g * Dir::down;
 
 	ball.getShape()->setPosition(0.f, Dir::up * (h + radius));
+	ball.set_zero_coordinates();
 	center_view();
 
 	// delete tracers
@@ -187,10 +189,11 @@ void ProjectileSimulator::draw_widget(Widget* widget)
 
 void ProjectileSimulator::create_widgets()
 {
+	// ============== Widgets for entering data
 	auto space = 170;
 	auto startx = -630;
 	int height = 96;
-	widgets.clear();
+	widgets_in.clear();
 	Widget* widget_v0 = new Widget(startx				, -height , 160, height, "V0=");
 	Widget* widget_alpha = new Widget(startx + space * 1, -height , 160, height, "alfa=");
 	Widget* widget_h = new Widget(startx + space * 2	, -height , 160, height, "h=");
@@ -210,13 +213,30 @@ void ProjectileSimulator::create_widgets()
 	//Widget* widget5 = new Widget(startx + space * 5, -40, 160, 80,"?=");
 	//Widget* widget6 = new Widget(startx + space * 6, -40, 160, 80,"?=");
 
-	widgets.push_back(widget_v0);
-	widgets.push_back(widget_alpha);
-	widgets.push_back(widget_h);
-	widgets.push_back(widget_g);
+	widgets_in.push_back(widget_v0);
+	widgets_in.push_back(widget_alpha);
+	widgets_in.push_back(widget_h);
+	widgets_in.push_back(widget_g);
 	//widgets.push_back(widget4);
 	//widgets.push_back(widget5);
 	//widgets.push_back(widget6);
+
+
+	// ============== Widgets for displaying real-time data
+	Widget* widget_x = new Widget(startx			, 0, 160, height, "X=");
+	Widget* widget_y = new Widget(startx + space * 1, 0, 160, height, "Y=");
+	Widget* widget_vx = new Widget(startx + space * 2, 0, 160, height, "Vx=");
+	Widget* widget_vy = new Widget(startx + space * 3, 0, 160, height, "Vy=");
+
+	widgets_other.push_back(widget_x);
+	widgets_other.push_back(widget_y);
+	widgets_other.push_back(widget_vx);
+	widgets_other.push_back(widget_vy);
+
+	widget_x->bind_variable(&ball_x);
+	widget_y->bind_variable(&ball_y);
+	widget_vx->bind_variable(&vx);
+	widget_vy->bind_variable(&vy);
 
 }
 
@@ -238,19 +258,19 @@ void ProjectileSimulator::handle_tab()
 	if (focus_number == -1)
 	{
 		focus_number = 0;
-		widgets[0]->toggle_focus();
+		widgets_in[0]->toggle_focus();
 	}
 	else
 	{
-		widgets[focus_number]->update_variable(); // update previous widget
-		widgets[focus_number]->toggle_focus(); // turn it OFF
+		widgets_in[focus_number]->update_variable(); // update previous widget
+		widgets_in[focus_number]->toggle_focus(); // turn it OFF
 
 		focus_number++;
 
-		if (focus_number >= widgets.size())
+		if (focus_number >= widgets_in.size())
 			focus_number = -1;	// This was last widget, set to -1
 		else
-			widgets[focus_number]->toggle_focus(); // turn ON new widget
+			widgets_in[focus_number]->toggle_focus(); // turn ON new widget
 	}
 }
 
@@ -284,8 +304,8 @@ void ProjectileSimulator::handle_entering_numbers(sf::Event event)
 		event.text.unicode == '.'
 		))
 	{
-		auto current_text = widgets[focus_number]->get_user_text();
-		widgets[focus_number]->set_user_text(current_text + (char)(event.text.unicode));
+		auto current_text = widgets_in[focus_number]->get_user_text();
+		widgets_in[focus_number]->set_user_text(current_text + (char)(event.text.unicode));
 	}
 }
 
@@ -314,7 +334,7 @@ void ProjectileSimulator::handle_event(sf::Event event)
 				event.key.code == sf::Keyboard::Delete)
 			)
 		{
-			widgets[focus_number]->delete_last_char();
+			widgets_in[focus_number]->delete_last_char();
 		}
 		break;
 
@@ -327,6 +347,17 @@ void ProjectileSimulator::handle_event(sf::Event event)
 		break;
 	default:
 		break;
+	}
+
+}
+
+void ProjectileSimulator::update_widgets()
+{
+	ball_x = ball.getShape()->getPosition().x - ball.x_zero;
+	ball_y = ball.getShape()->getPosition().y - ball.y_zero;
+	for (int i = 0; i < widgets_other.size(); i++)
+	{
+		widgets_other[i]->update_widget();
 	}
 
 }
@@ -370,18 +401,27 @@ void ProjectileSimulator::game_loop()
 			}
 		}
 		
+		text1.setString(std::to_string(vy));
+		text1.setPosition(-640 + 20, 20);
+		//window.draw(text1);
+
+		update_widgets();
+
 		//============ Drawing 
 		
 		// Widgets
 		window.setView(view_controls);
+
 		window.draw(top_bar);
-		for (auto i = 0; i < widgets.size(); i++)
+		for (auto i = 0; i < widgets_in.size(); i++)
 		{
-			draw_widget(widgets[i]);
+			draw_widget(widgets_in[i]);
 		}
-		text1.setString(std::to_string(vy));
-		text1.setPosition(-640+20, 20);
-		window.draw(text1);
+
+		for (auto i = 0; i < widgets_other.size(); i++)
+		{
+			draw_widget(widgets_other[i]);
+		}
 
 		window.setView(view_game);
 
@@ -391,15 +431,11 @@ void ProjectileSimulator::game_loop()
 			window.draw(*tracers[i]);
 		}
 
-
-
 		window.draw(ground);
 		window.draw(rect00);
 		window.draw(*(ball.getShape()));
 		//window.draw(playerText);
 		window.display();
-
-		
 
 		fps_per_sec++;
 	}

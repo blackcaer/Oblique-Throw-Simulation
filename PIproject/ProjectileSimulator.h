@@ -30,7 +30,8 @@ private:
 	sf::RectangleShape ground;
 	sf::RectangleShape rect00;
 	Projectile ball;
-	std::vector <Widget*> widgets;
+	std::vector <Widget*> widgets_in;
+	std::vector <Widget*> widgets_other;
 
 
 	float VIEW_CHANGE = 30.f;
@@ -53,11 +54,13 @@ private:
 	const float START_v_start = 8.f;
 	const float START_g = 9.81f;
 
-
 	float h; // Can be set by user
 	float angle; // Can be set by user
 	float v_start; // Can be set by user
 	float g; // Can be set by user
+
+	float ball_x = 0.f;
+	float ball_y = 0.f;
 
 	float radius;
 	float vx;
@@ -100,7 +103,7 @@ private:
 
 	void create_widgets();
 
-
+	void update_widgets();
 
 };
 
