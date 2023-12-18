@@ -29,10 +29,13 @@ private:
 	sf::View view_controls;
 	sf::RectangleShape ground;
 	sf::RectangleShape rect00;
+	sf::RectangleShape top_bar;
 	Projectile ball;
 	std::vector <Widget*> widgets_in;
 	std::vector <Widget*> widgets_other;
+	std::vector <Widget*> widgets_static;
 
+	bool follow_ball = true;
 
 	float VIEW_CHANGE = 30.f;
 	float unit_to_px = 100.f;
@@ -54,7 +57,7 @@ private:
 	const float START_v_start = 8.f;
 	const float START_g = 9.81f;
 
-	float h; // Can be set by user
+	float h_start; // Can be set by user
 	float angle; // Can be set by user
 	float v_start; // Can be set by user
 	float g; // Can be set by user
@@ -67,6 +70,10 @@ private:
 	float vy;
 	float ax;
 	float ay;
+
+	float Z;
+	float Hmax;
+	float th;
 
 	int fps_per_sec = 0;
 	float sec_elapsed = 0.f;
@@ -99,11 +106,14 @@ private:
 
 	void trace();
 
-	void draw_widget(Widget*);
+	void _draw_widget(Widget*);
+
+	void _draw_widgets();
 
 	void create_widgets();
 
-	void update_widgets();
+	void update_real_time_widgets();
 
+	void update_static_widgets();
 };
 

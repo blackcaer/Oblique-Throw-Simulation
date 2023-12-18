@@ -57,8 +57,8 @@ void Widget::set_static_text(std::string static_text)
 void Widget::centerText()
 {
 	auto w = this->text->getLocalBounds().width;
-	auto h = this->text->getLocalBounds().height;
-	this->text->setPosition(x + (width - w) / 2.f, y + (height - h) / 2.f);
+	auto h_start = this->text->getLocalBounds().height;
+	this->text->setPosition(x + (width - w) / 2.f, y + (height - h_start) / 2.f);
 	//this->text->setPosition(x + (width) / 2.f, y + (height) / 2.f);
 }
 
