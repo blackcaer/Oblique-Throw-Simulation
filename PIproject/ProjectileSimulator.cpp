@@ -416,16 +416,11 @@ void ProjectileSimulator::handle_entering_numbers(sf::Event event)
 
 void ProjectileSimulator::handle_event(sf::Event event)
 {
-	switch (event.type)
-	{
+	switch (event.type){
 	case sf::Event::Closed:
-
-		// end the program
 		running = false;
 		break;
-	case sf::Event::Resized:
 
-		break;
 	case sf::Event::KeyPressed:
 
 		handle_moving_view(event);
@@ -433,27 +428,21 @@ void ProjectileSimulator::handle_event(sf::Event event)
 		if (event.key.code == sf::Keyboard::Tab)
 			handle_tab();
 
-		if (
-			focus_number != -1 and
-			(event.key.code == sf::Keyboard::BackSpace or
-				event.key.code == sf::Keyboard::Delete)
-			)
+		if (focus_number != -1 and (
+				event.key.code == sf::Keyboard::BackSpace or
+				event.key.code == sf::Keyboard::Delete))
 		{
 			widgets_in[focus_number]->delete_last_char();
 		}
 		break;
 
 	case sf::Event::TextEntered:
-		printf("%c", event.text.unicode);
+
 		handle_entering_numbers(event);
 		if (focus_number == -1)
 			handle_letters(event);
-
-		break;
-	default:
 		break;
 	}
-
 }
 
 void ProjectileSimulator::move()
@@ -479,8 +468,7 @@ void ProjectileSimulator::game_loop()
 	float time_for_tracer = 0.0f;
 	sf::Event event;
 
-	while (running)
-	{
+	while (running){
 		deltaTime = deltaClock.restart();
 
 		while (window.pollEvent(event))
