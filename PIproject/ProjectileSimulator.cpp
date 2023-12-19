@@ -438,9 +438,10 @@ void ProjectileSimulator::handle_event(sf::Event event)
 
 	case sf::Event::TextEntered:
 
-		handle_entering_numbers(event);
 		if (focus_number == -1)
 			handle_letters(event);
+		else
+			handle_entering_numbers(event);
 		break;
 	}
 }
