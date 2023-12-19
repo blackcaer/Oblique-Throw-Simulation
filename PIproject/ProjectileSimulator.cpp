@@ -313,7 +313,7 @@ void ProjectileSimulator::reset()
 		center_view();
 
 	// Calculate static variables
-	Z = fabs(vx * ((fabs(vy) + sqrt(vy * vy + 2.f * fabs(ay) * h_start)) / ay));
+	Z = vx * ((fabs(vy) + sqrt(vy * vy + 2.f * fabs(ay) * h_start)) / ay);
 	Hmax = h_start + fabs(vy * vy / (2 * ay));
 	th = fabs(vy / ay);
 

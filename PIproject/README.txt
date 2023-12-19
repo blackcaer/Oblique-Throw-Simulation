@@ -8,16 +8,23 @@ v - toggle following ball
 
 
 
-
-
-
-
 colors as uint32 numbers
 max color (white) 4294967295
 
-config: 
+dark mode config: 
 
-stats_file=
+stats_file=stats.txt
+color_ball=252645375
+color_background=2305343
+color_ground=5980671
+unit_to_px=50
+ball_radius=20
+view_change=50
+tracer_radius=10
+
+default config: 
+
+stats_file=stats.txt
 color_ball=
 color_background=
 color_ground=
