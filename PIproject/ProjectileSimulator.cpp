@@ -476,7 +476,7 @@ void ProjectileSimulator::move()
 
 void ProjectileSimulator::game_loop()
 {
-	float time_for_tracer_s = 0.0f;
+	float time_for_tracer = 0.0f;
 	sf::Event event;
 
 	while (running)
@@ -491,17 +491,16 @@ void ProjectileSimulator::game_loop()
 		if (simulate_movement)
 		{
 			move();
-			time_for_tracer_s += deltaTime.asSeconds();
-			if (time_for_tracer_s >= tracer_interval)
+			time_for_tracer += deltaTime.asSeconds();
+			if (time_for_tracer >= tracer_interval)
 			{
-				time_for_tracer_s = 0.f;
+				time_for_tracer = 0.f;
 				trace();
 			}
 		}
 		update_real_time_widgets();
 
 		//============ Drawing 
-
 		window.clear(COLOR_BACKGROUND);
 		window.setView(view_game);
 
