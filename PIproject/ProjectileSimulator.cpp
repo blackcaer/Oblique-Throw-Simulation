@@ -59,6 +59,36 @@ ProjectileSimulator::ProjectileSimulator(ProjectileSimulatorArgs args) :
 
 }
 
+void ProjectileSimulator::_save_params_to_file()
+{
+	std::ofstream myfile;
+	myfile.open(STATS_FILE, std::ofstream::app);
+
+	myfile << "v_start: ";
+	myfile << v_start;
+	myfile << "; ";
+	myfile << "angle: ";
+	myfile << angle;
+	myfile << "; ";
+	myfile << "h_start: ";
+	myfile << h_start;
+	myfile << "; ";
+	myfile << "g: ";
+	myfile << g;
+	myfile << "; ";
+	myfile << "Z: ";
+	myfile << Z;
+	myfile << "; ";
+	myfile << "Hmax: ";
+	myfile << Hmax;
+	myfile << "; ";
+	myfile << "th: ";
+	myfile << th;
+	myfile << "; ";
+	myfile << "\n";
+	myfile.close();
+}
+
 void ProjectileSimulator::prep_text(sf::Text* text,int size,sf::Color color)
 {
 	text->setFont(font_main);
@@ -83,13 +113,13 @@ void ProjectileSimulator::reset()
 	ax = 0.f;
 	ay = g * Dir::down;
 
-	ball.getShape()->setPosition(0.f, Dir::up * (h_start + radius));
+	ball.getShape()->setPosition(0.f, Dir::up * (h_start*unit_to_px + radius));
 	ball.set_zero_coordinates();
 	if(follow_ball)
 		center_view();
 
 	// Calculate static variables
-	Z = v_start * v_start * sin(2.f * deg_to_rad(angle)) / fabs(ay);
+	Z = fabs(vx)*((fabs(vy)+ sqrt(vy* vy + 2.f * fabs(ay) * h_start)) / fabs(ay));
 	Hmax = h_start + fabs(vy * vy / (2 * ay));
 	th = fabs(vy / ay);
 
@@ -353,7 +383,10 @@ void ProjectileSimulator::handle_tab()
 void ProjectileSimulator::handle_letters(sf::Event event)
 {
 	if (event.text.unicode == 's')
+	{
 		simulate_movement = true;
+		_save_params_to_file();
+	}
 	if (event.text.unicode == 'x')
 		view_game.zoom(2.f);
 	if (event.text.unicode == 'z')
@@ -376,13 +409,20 @@ void ProjectileSimulator::handle_letters(sf::Event event)
 
 void ProjectileSimulator::handle_entering_numbers(sf::Event event)
 {
-	if (focus_number != -1 and ((
+	if (focus_number == -1)
+		return;
+	auto current_text = widgets_in[focus_number]->get_user_text();
+	if (
 		event.text.unicode >= 48 and
-		event.text.unicode <= 57) or
-		event.text.unicode == '.'
-		))
+		event.text.unicode <= 57
+		)
 	{
-		auto current_text = widgets_in[focus_number]->get_user_text();
+		widgets_in[focus_number]->set_user_text(current_text + (char)(event.text.unicode));
+	}
+	else if (event.text.unicode == '.')
+	{
+		if (current_text.find('.') != std::string::npos)
+			return;
 		widgets_in[focus_number]->set_user_text(current_text + (char)(event.text.unicode));
 	}
 }

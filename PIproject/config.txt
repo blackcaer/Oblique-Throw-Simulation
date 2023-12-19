@@ -1,4 +1,4 @@
-stats_file=
+stats_file=stats.txt
 color_ball=
 color_background=
 color_ground=

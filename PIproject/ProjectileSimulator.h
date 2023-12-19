@@ -7,9 +7,12 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <cmath>
+#include <iostream>
+#include <fstream>
 #include "Projectile.h"
 #include "Dir.h"
 #include "Widget.h"
+
 
 struct ProjectileSimulatorArgs {
 	std::string stats_file = "";
@@ -72,9 +75,9 @@ private:
 	const float START_v_start = 8.f;
 	const float START_g = 9.81f;
 
-	float h_start; // Can be set by user
-	float angle; // Can be set by user
 	float v_start; // Can be set by user
+	float angle; // Can be set by user
+	float h_start; // Can be set by user
 	float g; // Can be set by user
 
 	float ball_x = 0.f;
@@ -94,6 +97,8 @@ private:
 	float sec_elapsed = 0.f;
 
 	static float deg_to_rad(float angle_deg);
+
+	void _save_params_to_file();
 
 	void prep_text(sf::Text* text, int size, sf::Color color);
 
@@ -130,5 +135,7 @@ private:
 	void update_real_time_widgets();
 
 	void update_static_widgets();
+
+	
 };
 
