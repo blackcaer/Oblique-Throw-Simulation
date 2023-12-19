@@ -1,15 +1,5 @@
 // blackcaer
 
-/*
-* #define _USE_MATH_DEFINES
-#define TOLERANCE_F 1e-6
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-#include <cmath>
-#include "Projectile.h"
-#include "Dir.h"
-#include "Widget.h"*/
-
 #include "ProjectileSimulator.h"
 
 #include <sstream>
@@ -19,6 +9,7 @@
 const std::string CONFIG_PATH = "config.txt";
 
 void parse_args(std::string key, std::string value, ProjectileSimulatorArgs* args);
+
 ProjectileSimulatorArgs get_config(std::string config_path);
 
 int main()

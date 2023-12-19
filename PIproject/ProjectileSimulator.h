@@ -2,7 +2,6 @@
 #define _USE_MATH_DEFINES
 #define TOLERANCE_F 1e-6
 
-
 #include <vector>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -13,12 +12,11 @@
 #include "Dir.h"
 #include "Widget.h"
 
-
 struct ProjectileSimulatorArgs {
 	std::string stats_file = "";
-	sf::Color color_ball = sf::Color::Red;
-	sf::Color color_background = sf::Color(110, 110, 110, 255);
-	sf::Color color_ground = sf::Color::Green;
+	sf::Color color_ball = sf::Color::Red; 
+	sf::Color color_background = sf::Color(140, 140, 140, 255);
+	sf::Color color_ground = sf::Color(32, 145, 40, 255);
 	float unit_to_px = 50.f;
 	float ball_radius = 16.f;
 	float view_change = 30.f;;
@@ -34,7 +32,6 @@ public:
 
 	void game_loop();
 
-
 private:
 	const std::string STATS_FILE;
 	sf::Color COLOR_BALL;
@@ -46,7 +43,7 @@ private:
 	sf::View view_game;
 	sf::View view_controls;
 	sf::RectangleShape ground;
-	sf::RectangleShape rect00;
+	sf::RectangleShape start_marker;
 	sf::RectangleShape top_bar;
 	Projectile ball;
 	std::vector <Widget*> widgets_in;
@@ -93,8 +90,7 @@ private:
 	float Hmax;
 	float th;
 
-	int fps_per_sec = 0;
-	float sec_elapsed = 0.f;
+	float _sec_elapsed = 0.f;
 
 	static float deg_to_rad(float angle_deg);
 
@@ -102,7 +98,7 @@ private:
 
 	void _prep_text(sf::Text* text, int size, sf::Color color);
 
-	void print_info_to_console();
+	void _print_info_to_console();
 
 	void handle_event(sf::Event);
 
@@ -120,7 +116,7 @@ private:
 
 	bool is_collision(float y);
 
-	bool check_handle_collision(float*, float*);
+	bool handle_collision(float*, float*);
 
 	void move();
 
@@ -128,7 +124,7 @@ private:
 
 	void _draw_widget(Widget*);
 
-	void _draw_widgets();
+	void draw_widgets();
 
 	void create_widgets();
 

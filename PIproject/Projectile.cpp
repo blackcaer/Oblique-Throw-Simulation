@@ -39,7 +39,6 @@ sf::Shape* Projectile::getShape()
 void Projectile::move(float x, float y)
 {
 	shape->move(x, y);
-
 }
 
 void Projectile::set_zero_coordinates()
