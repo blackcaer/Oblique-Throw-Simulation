@@ -131,6 +131,5 @@ void Widget::update_widget()
 
 		user_text = stream.str();
 		this->_set_text();
-
 	}
 }
