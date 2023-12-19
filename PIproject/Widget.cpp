@@ -28,7 +28,7 @@ Widget::Widget(
 	set_static_text(static_text);
 	set_user_text(user_text);
 
-	prep_text(text);
+	_prep_text(text);
 	setPosition(x, y);
 
 	to_draw.push_back(rect_back);
@@ -94,7 +94,7 @@ std::string Widget::get_user_text()
 	return user_text;
 }
 
-void Widget::prep_text(sf::Text* text)
+void Widget::_prep_text(sf::Text* text)
 {
 	text->setFont(font_main);
 	text->setCharacterSize(pixel_size); // in pixels, not points

@@ -42,7 +42,7 @@ public:
 		std::string font_file = "arial.ttf"
 	);
 
-	void prep_text(sf::Text* text);
+	void _prep_text(sf::Text* text);
 
 	void setPosition(float, float);
 

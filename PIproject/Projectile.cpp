@@ -1,6 +1,6 @@
 #include "Projectile.h"
 
-Projectile::Projectile(float r, float x, float y,sf::Color default_ball_color) : 
+Projectile::Projectile(float r, float x, float y, sf::Color default_ball_color) :
 	DEF_COLOR(default_ball_color)
 {
 	sf::CircleShape* new_shape = new sf::CircleShape();

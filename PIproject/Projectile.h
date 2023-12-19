@@ -7,7 +7,7 @@ class Projectile
 private:
 	sf::CircleShape* shape;
 	const sf::Color DEF_COLOR = sf::Color::Red;
-	
+
 public:
 	float x_zero = 0.f;
 	float y_zero = 0.f;

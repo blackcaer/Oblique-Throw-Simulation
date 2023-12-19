@@ -17,7 +17,7 @@ ProjectileSimulator::ProjectileSimulator(ProjectileSimulatorArgs args) :
 	ground(sf::Vector2f(400000, 200000)),
 	rect00(sf::Vector2f(5, 5))
 {
-	window.setPosition(sf::Vector2i(120,20));
+	window.setPosition(sf::Vector2i(120, 20));
 	radius = START_radius;
 	h_start = START_h;
 	angle = START_angle;
@@ -41,7 +41,7 @@ ProjectileSimulator::ProjectileSimulator(ProjectileSimulatorArgs args) :
 	top_bar = sf::RectangleShape(sf::Vector2f(1280, 300));
 	top_bar.setFillColor(sf::Color(90, 90, 90));
 	top_bar.setPosition(-640, -100);
-	
+
 	ground.setFillColor(COLOR_GROUND);
 	ground.setPosition(-70000, 0);
 
@@ -89,7 +89,7 @@ void ProjectileSimulator::_save_params_to_file()
 	myfile.close();
 }
 
-void ProjectileSimulator::prep_text(sf::Text* text,int size,sf::Color color)
+void ProjectileSimulator::_prep_text(sf::Text* text, int size, sf::Color color)
 {
 	text->setFont(font_main);
 
@@ -113,13 +113,13 @@ void ProjectileSimulator::reset()
 	ax = 0.f;
 	ay = g * Dir::down;
 
-	ball.getShape()->setPosition(0.f, Dir::up * (h_start*unit_to_px + radius));
+	ball.getShape()->setPosition(0.f, Dir::up * (h_start * unit_to_px + radius));
 	ball.set_zero_coordinates();
-	if(follow_ball)
+	if (follow_ball)
 		center_view();
 
 	// Calculate static variables
-	Z = fabs(vx)*((fabs(vy)+ sqrt(vy* vy + 2.f * fabs(ay) * h_start)) / fabs(ay));
+	Z = fabs(vx) * ((fabs(vy) + sqrt(vy * vy + 2.f * fabs(ay) * h_start)) / fabs(ay));
 	Hmax = h_start + fabs(vy * vy / (2 * ay));
 	th = fabs(vy / ay);
 
@@ -131,6 +131,7 @@ void ProjectileSimulator::reset()
 	tracers.clear();
 
 	update_static_widgets();
+	simulate_movement = false;
 
 }
 
@@ -212,7 +213,7 @@ void ProjectileSimulator::move()
 
 	vx += ax * dt;
 	vy += ay * dt;
-	
+
 	bool will_collide = check_handle_collision(&xoffset, &yoffset);
 	if (will_collide)
 	{
@@ -222,7 +223,7 @@ void ProjectileSimulator::move()
 	}
 	ball.move(xoffset, yoffset);
 
-	if(follow_ball)
+	if (follow_ball)
 		center_view();
 }
 
@@ -269,10 +270,10 @@ void ProjectileSimulator::create_widgets()
 	auto startx = -630;
 	int height = 96;
 	widgets_in.clear();
-	Widget* widget_v0 = new Widget(startx				, -5-height , 160, height, "V0=");
-	Widget* widget_alpha = new Widget(startx + space * 1, -5 -height , 160, height, "alfa=");
-	Widget* widget_h = new Widget(startx + space * 2	, -5 -height , 160, height, "h=");
-	Widget* widget_g = new Widget(startx + space * 3	, -5 -height , 160, height, "g=");
+	Widget* widget_v0 = new Widget(startx, -5 - height, 160, height, "V0=");
+	Widget* widget_alpha = new Widget(startx + space * 1, -5 - height, 160, height, "alfa=");
+	Widget* widget_h = new Widget(startx + space * 2, -5 - height, 160, height, "h=");
+	Widget* widget_g = new Widget(startx + space * 3, -5 - height, 160, height, "g=");
 
 	widget_v0->bind_variable(&v_start);
 	widget_alpha->bind_variable(&angle);
@@ -298,7 +299,7 @@ void ProjectileSimulator::create_widgets()
 
 
 	// ============== Widgets for displaying real-time data
-	Widget* widget_x = new Widget(startx			, 5, 160, height, "X=");
+	Widget* widget_x = new Widget(startx, 5, 160, height, "X=");
 	Widget* widget_y = new Widget(startx + space * 1, 5, 160, height, "Y=");
 	Widget* widget_vx = new Widget(startx + space * 2, 5, 160, height, "Vx=");
 	Widget* widget_vy = new Widget(startx + space * 3, 5, 160, height, "Vy=");
@@ -315,9 +316,9 @@ void ProjectileSimulator::create_widgets()
 
 	// ============== Widgets for displaying static data
 
-	Widget* widget_Z = new Widget(20+startx + space * 4			, -5 -height, 160, height, "Zmax=");
-	Widget* widget_Hmax = new Widget(20 + startx + space * 5	, -5 -height, 160, height, "Hmax=");
-	Widget* widget_th = new Widget(20 + startx + space * 6		, -5 -height, 160, height, "th=");
+	Widget* widget_Z = new Widget(20 + startx + space * 4, -5 - height, 160, height, "Zmax=");
+	Widget* widget_Hmax = new Widget(20 + startx + space * 5, -5 - height, 160, height, "Hmax=");
+	Widget* widget_th = new Widget(20 + startx + space * 6, -5 - height, 160, height, "th=");
 	//Widget* widget_vy = new Widget(startx + space * 3, 0, 160, height, "Vy=");
 
 	widgets_static.push_back(widget_Z);
@@ -376,7 +377,7 @@ void ProjectileSimulator::handle_tab()
 		else
 			widgets_in[focus_number]->toggle_focus(); // turn ON new widget
 
-		
+
 	}
 }
 
@@ -485,7 +486,7 @@ void ProjectileSimulator::game_loop()
 
 
 	sf::Text text1 = sf::Text();
-	prep_text(&text1, 32, sf::Color::Black);
+	_prep_text(&text1, 32, sf::Color::Black);
 	//text1.setPosition();
 
 	float time_for_tracer_s = 0.0f;
@@ -515,12 +516,12 @@ void ProjectileSimulator::game_loop()
 				trace();
 			}
 		}
-		
+
 
 		update_real_time_widgets();
 
 		//============ Drawing 
-		
+
 		// Widgets
 		window.setView(view_controls);
 

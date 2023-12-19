@@ -19,7 +19,7 @@ struct ProjectileSimulatorArgs {
 	sf::Color color_ball = sf::Color::Red;
 	sf::Color color_background = sf::Color(110, 110, 110, 255);
 	sf::Color color_ground = sf::Color::Green;
-	float unit_to_px = 100.f;
+	float unit_to_px = 50.f;
 	float ball_radius = 16.f;
 	float view_change = 30.f;;
 	float tracer_radius = 6.f;
@@ -100,7 +100,7 @@ private:
 
 	void _save_params_to_file();
 
-	void prep_text(sf::Text* text, int size, sf::Color color);
+	void _prep_text(sf::Text* text, int size, sf::Color color);
 
 	void print_info_to_console();
 
@@ -136,6 +136,6 @@ private:
 
 	void update_static_widgets();
 
-	
+
 };
 
