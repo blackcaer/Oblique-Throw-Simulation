@@ -11,19 +11,34 @@
 #include "Dir.h"
 #include "Widget.h"
 
+struct ProjectileSimulatorArgs {
+	std::string stats_file = "";
+	sf::Color color_ball = sf::Color::Red;
+	sf::Color color_background = sf::Color(110, 110, 110, 255);
+	sf::Color color_ground = sf::Color::Green;
+	float unit_to_px = 100.f;
+	float ball_radius = 16.f;
+	float view_change = 30.f;;
+	float tracer_radius = 6.f;
+};
+
 class ProjectileSimulator
 {
 public:
 	bool running = true;
 
-	ProjectileSimulator();
+	ProjectileSimulator(ProjectileSimulatorArgs args);
 
 	void game_loop();
 
 
 private:
-	sf::Font font_main;
+	const std::string STATS_FILE;
+	sf::Color COLOR_BALL;
+	sf::Color COLOR_BACKGROUND;
+	sf::Color COLOR_GROUND;
 
+	sf::Font font_main;
 	sf::RenderWindow window;
 	sf::View view_game;
 	sf::View view_controls;
@@ -37,21 +52,21 @@ private:
 
 	bool follow_ball = true;
 
-	float VIEW_CHANGE = 30.f;
-	float unit_to_px = 100.f;
+	float VIEW_CHANGE;
+	float unit_to_px;
 	bool simulate_movement = false;
 	sf::Time deltaTime;
 	sf::Clock deltaClock;
 
 	//tracer
-	const float TRACER_RADIUS = 6.f;
+	const float TRACER_RADIUS;
 	std::vector <sf::CircleShape*> tracers;
 	float tracer_interval = 0.03f;
 	sf::Color tracer_color = sf::Color::Blue;
 
 	int focus_number = -1;
 
-	const float START_radius = 16.f;
+	const float START_radius;
 	const float START_h = 0.f;
 	const float START_angle = 45.f;
 	const float START_v_start = 8.f;

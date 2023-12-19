@@ -7,15 +7,12 @@ class Projectile
 private:
 	sf::CircleShape* shape;
 	const sf::Color DEF_COLOR = sf::Color::Red;
-		
 	
 public:
 	float x_zero = 0.f;
 	float y_zero = 0.f;
 
-	Projectile(sf::CircleShape* shape);
-
-	Projectile(float r = 10.f, float x = 0.f, float y = 0.f);
+	Projectile(float r = 10.f, float x = 0.f, float y = 0.f, sf::Color default_ball_color = sf::Color::Red);
 
 	~Projectile();
 

@@ -1,14 +1,23 @@
 ﻿#include "ProjectileSimulator.h"
 
 
-// TODO: Przeniesc ground i rect00 do tablicy do pozniejszego draw
-ProjectileSimulator::ProjectileSimulator() :
+ProjectileSimulator::ProjectileSimulator(ProjectileSimulatorArgs args) :
+	START_radius(args.ball_radius),
+	unit_to_px(args.unit_to_px),
+	VIEW_CHANGE(args.view_change),
+	TRACER_RADIUS(args.tracer_radius),
+	COLOR_BALL(args.color_ball),
+	COLOR_BACKGROUND(args.color_background),
+	COLOR_GROUND(args.color_ground),
+	STATS_FILE(args.stats_file),
+
 	window(sf::VideoMode(1536, 960), "FluidSimulator", sf::Style::Default, sf::ContextSettings(32)),
 	view_game(sf::FloatRect(0, 0, 1080, 720)),//sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f), sf::Vector2f(1280,720)), 
 	view_controls(sf::Vector2f(0, 0), sf::Vector2f(1280, 192)),
-	ground(sf::Vector2f(200000, 20)),
+	ground(sf::Vector2f(400000, 200000)),
 	rect00(sf::Vector2f(5, 5))
 {
+	window.setPosition(sf::Vector2i(120,20));
 	radius = START_radius;
 	h_start = START_h;
 	angle = START_angle;
@@ -33,7 +42,7 @@ ProjectileSimulator::ProjectileSimulator() :
 	top_bar.setFillColor(sf::Color(90, 90, 90));
 	top_bar.setPosition(-640, -100);
 	
-	ground.setFillColor(sf::Color::Green);
+	ground.setFillColor(COLOR_GROUND);
 	ground.setPosition(-70000, 0);
 
 	rect00.setFillColor(sf::Color::Blue);
@@ -41,13 +50,12 @@ ProjectileSimulator::ProjectileSimulator() :
 
 	create_widgets();
 
-	this->ball = Projectile(radius, 0.f, h_start + radius);
+	this->ball = Projectile(radius, 0.f, h_start + radius, COLOR_BALL);
 	ball.set_zero_coordinates();
 	reset();
 
 	view_controls.setViewport(sf::FloatRect(0, 0, 1, 0.2));
 	view_game.setViewport(sf::FloatRect(0, 0.2, 1, 1));
-
 
 }
 
@@ -77,7 +85,8 @@ void ProjectileSimulator::reset()
 
 	ball.getShape()->setPosition(0.f, Dir::up * (h_start + radius));
 	ball.set_zero_coordinates();
-	center_view();
+	if(follow_ball)
+		center_view();
 
 	// Calculate static variables
 	Z = v_start * v_start * sin(2.f * deg_to_rad(angle)) / fabs(ay);
@@ -330,11 +339,14 @@ void ProjectileSimulator::handle_tab()
 		focus_number++;
 
 		if (focus_number >= widgets_in.size())
+		{
 			focus_number = -1;	// This was last widget, set to -1
+			reset(); // So you don't have to start two times for changes to take place
+		}
 		else
 			widgets_in[focus_number]->toggle_focus(); // turn ON new widget
 
-		reset(); // So you don't have to start two times for changes to take place
+		
 	}
 }
 
@@ -449,7 +461,7 @@ void ProjectileSimulator::game_loop()
 		}
 
 		window.setView(view_game);
-		window.clear(sf::Color(110, 110, 110, 255));
+		window.clear(COLOR_BACKGROUND);
 
 		print_info_to_console();
 
