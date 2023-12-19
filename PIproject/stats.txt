@@ -68,3 +68,4 @@ v_start: 8; angle: 45; h_start: 0; g: 9.81; Z: 6.52395; Hmax: 1.63099; th: 0.576
 v_start: 8; angle: 45; h_start: 0; g: 9.81; Z: 6.52395; Hmax: 1.63099; th: 0.576642; 
 v_start: 8; angle: 45; h_start: 0; g: 9.81; Z: 6.52395; Hmax: 1.63099; th: 0.576642; 
 v_start: 8; angle: 43; h_start: 0; g: 9; Z: 7.09379; Hmax: 1.65377; th: 0.606221; 
+v_start: 8; angle: 135; h_start: 0; g: 9.81; Z: 6.52395; Hmax: 1.63099; th: 0.576642; 

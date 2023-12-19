@@ -14,8 +14,9 @@ ProjectileSimulatorArgs get_config(std::string config_path);
 
 int main()
 {
-	auto config = get_config(CONFIG_PATH);
+	ProjectileSimulatorArgs config = get_config(CONFIG_PATH);
 	auto simulator = new ProjectileSimulator(config);
+
 	simulator->game_loop();
 
 	return 0;
