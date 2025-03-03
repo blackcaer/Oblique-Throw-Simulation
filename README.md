@@ -1,4 +1,4 @@
-# Oblique Projectile Motion Simulation
+# Oblique Throw Simulation
 
 A simulation of oblique projectile motion, designed for an interactive and customizable user experience.
 
